@@ -1,0 +1,45 @@
+# ArgoCD Values for Homelab (RPi 5)
+
+global:
+  domain: argocd.local
+
+configs:
+  params:
+    server.insecure: true
+    reposerver.metrics.listen.address: 0.0.0.0
+
+controller:
+  replicas: 1
+  resources:
+    limits:
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+server:
+  replicas: 1
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+repoServer:
+  replicas: 1
+  resources:
+    limits:
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+
+applicationSet:
+  replicas: 1
+
+redis-ha:
+  enabled: false
+
+redis:
+  enabled: true

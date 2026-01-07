@@ -1,4 +1,10 @@
 disable:
   - traefik
+  - servicelb
+
+# Use Cilium as the CNI (requires installing Cilium after k3s).
+flannel-backend: "none"
+disable-network-policy: true
 prefer-bundled-bin: true
 write-kubeconfig-mode: "0644"
+disable-kube-proxy: true

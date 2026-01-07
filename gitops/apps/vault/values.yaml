@@ -1,0 +1,22 @@
+# Vault values for a single-node homelab.
+
+global:
+  tlsDisable: true
+
+server:
+  ha:
+    enabled: false
+
+  standalone:
+    enabled: true
+
+  dataStorage:
+    enabled: true
+    size: 5Gi
+
+ui:
+  enabled: true
+  serviceType: ClusterIP
+
+injector:
+  enabled: true

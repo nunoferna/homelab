@@ -1,0 +1,40 @@
+{
+    "tagOwners": {
+        "tag:k8s": [
+            "autogroup:admin"
+        ]
+    },
+    "autoApprovers": {
+        "exitNode": [
+            "tag:k8s"
+        ]
+    },
+    "grants": [
+        {
+            "src": [
+                "*"
+            ],
+            "dst": [
+                "*"
+            ],
+            "ip": [
+                "*"
+            ]
+        }
+    ],
+    "ssh": [
+        {
+            "action": "check",
+            "src": [
+                "autogroup:member"
+            ],
+            "dst": [
+                "autogroup:self"
+            ],
+            "users": [
+                "autogroup:nonroot",
+                "root"
+            ]
+        }
+    ]
+}

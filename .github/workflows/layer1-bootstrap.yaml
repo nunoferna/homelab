@@ -1,5 +1,9 @@
 name: Layer 1 - Host Bootstrap
 
+concurrency:
+  group: homelab-layer1
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ "main" ]

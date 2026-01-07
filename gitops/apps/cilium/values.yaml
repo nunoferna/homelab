@@ -1,0 +1,32 @@
+# Cilium for k3s/Raspberry Pi.
+# NOTE: this must be paired with k3s `disable-kube-proxy: true`.
+kubeProxyReplacement: "true"
+
+# On single-node k3s, pin API server to localhost to avoid relying on
+# service routing during early bootstrap.
+k8sServiceHost: "127.0.0.1"
+k8sServicePort: "6443"
+
+# Enable Cilium L2-aware LoadBalancer on the LAN.
+enableLBIPAM: true
+l2announcements:
+  enabled: true
+
+# L2 announcements uses Kubernetes Leases; bump the client rate limit a bit.
+k8sClientRateLimit:
+  qps: 20
+  burst: 40
+
+enableIPv4Masquerade: true
+bpf:
+  masquerade: true
+
+# Enable Gateway API (Cilium Envoy).
+gatewayAPI:
+  enabled: true
+  gatewayClass:
+    create: "true"
+
+# Single-node homelab: keep resource tuning minimal.
+operator:
+  replicas: 1

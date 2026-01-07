@@ -1,0 +1,55 @@
+name: Tailscale Terraform (Policy)
+
+concurrency:
+  group: homelab-tailscale-terraform
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - 'terraform/tailscale/**'
+  workflow_dispatch:
+
+jobs:
+  apply:
+    runs-on: self-hosted
+    # FIX 1: Correct indentation for the container block
+    container:
+      image: hashicorp/terraform:1.14.3
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # FIX 2: Removed 'hashicorp/setup-terraform'. 
+      # Since we are running INSIDE the hashicorp/terraform container, 
+      # the binary is already installed and in the PATH.
+
+      - name: Terraform Init / Plan / Apply
+        shell: sh # 'bash' might not be available in Alpine-based Terraform images; 'sh' is safer.
+        env:
+          TAILSCALE_OAUTH_CLIENT_ID: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+          TAILSCALE_OAUTH_CLIENT_SECRET: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+          TAILSCALE_TAILNET: ${{ secrets.TAILSCALE_TAILNET }}
+        run: |
+          # Use standard shell flags for safety
+          set -eu
+
+          cd terraform/tailscale
+
+          terraform init -input=false
+
+          # Import logic (unchanged)
+          if ! terraform state list 2>/dev/null | grep -q '^tailscale_acl\.policy$'; then
+             echo "Importing ACL Policy..."
+             terraform import -input=false tailscale_acl.policy acl
+          fi
+
+          if ! terraform state list 2>/dev/null | grep -q '^tailscale_tailnet_settings\.tailnet$'; then
+             echo "Importing Tailnet Settings..."
+             terraform import -input=false tailscale_tailnet_settings.tailnet tailnet_settings
+          fi
+
+          terraform plan -input=false
+          terraform apply -input=false -auto-approve

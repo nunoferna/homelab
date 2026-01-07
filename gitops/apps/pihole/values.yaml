@@ -1,0 +1,44 @@
+# Pi-hole values (homelab defaults).
+# Create a Secret named "pihole-admin" in the "pihole" namespace with key "password".
+# Example:
+# kubectl -n pihole create secret generic pihole-admin --from-literal=password='CHANGEME'
+
+# Do not use the chart's default "admin" password.
+adminPassword: ""
+
+admin:
+  enabled: true
+  existingSecret: pihole-admin
+  passwordKey: password
+
+# Persist Pi-hole settings.
+persistentVolumeClaim:
+  enabled: true
+  size: "2Gi"
+
+# DNS should be reachable on your LAN on port 53.
+# Expose the DNS service as a LoadBalancer.
+serviceDns:
+  type: LoadBalancer
+  # NOTE: Cilium L2 announcements is incompatible with externalTrafficPolicy=Local.
+  externalTrafficPolicy: Cluster
+  # Use Cilium LB IPAM to pin a stable IP from the Cilium LB pool.
+  loadBalancerIP: ""
+  loadBalancerClass: "io.cilium/l2-announcer"
+  annotations:
+    lbipam.cilium.io/ips: "192.168.1.240"
+
+# Disable DHCP by default to avoid unexpected network impact.
+serviceDhcp:
+  enabled: false
+
+serviceWeb:
+  type: ClusterIP
+
+ingress:
+  enabled: false
+
+# Basic Pi-hole env defaults.
+extraEnvVars:
+  FTLCONF_dns_listeningMode: "all"
+  TZ: "UTC"

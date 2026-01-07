@@ -36,27 +36,29 @@ if grep -q "Raspberry Pi" /proc/cpuinfo 2>/dev/null || [ -f /etc/rpi-issue ]; th
     fi
 fi
 
+K3S_CONFIG_DIR="/etc/rancher/k3s"
+K3S_CONFIG_FILE="${K3S_CONFIG_DIR}/config.yaml"
+
+# Always (re)apply configuration from repo.
+sudo mkdir -p "${K3S_CONFIG_DIR}"
+
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+CONFIG_SRC="$SCRIPT_DIR/config.yaml"
+
+if [ -f "$CONFIG_SRC" ]; then
+    sudo cp "$CONFIG_SRC" "${K3S_CONFIG_FILE}"
+    echo "K3s configuration file installed from $CONFIG_SRC"
+else
+    echo "WARNING: config.yaml not found at $CONFIG_SRC. Falling back to default install."
+fi
 
 if ! command -v k3s &> /dev/null; then
-    # Create K3s config directory
-    sudo mkdir -p /etc/rancher/k3s
-    
-    # Locate configuration relative to this script
-    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-    CONFIG_SRC="$SCRIPT_DIR/config.yaml"
-
-    if [ -f "$CONFIG_SRC" ]; then
-        sudo cp "$CONFIG_SRC" /etc/rancher/k3s/config.yaml
-        echo "K3s configuration file installed from $CONFIG_SRC"
-    else
-        echo "WARNING: config.yaml not found at $CONFIG_SRC. Falling back to default install."
-    fi
-
     echo "Installing K3s..."
     curl -sfL https://get.k3s.io | sh -
     echo "K3s installed."
 else
-    echo "K3s is already installed."
+    echo "K3s is already installed; restarting to apply config changes..."
+    sudo systemctl restart k3s
 fi
 
 echo "--- [K3s] Configuring User Access ---"
