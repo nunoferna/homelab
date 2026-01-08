@@ -24,16 +24,30 @@ serviceDns:
   externalTrafficPolicy: Cluster
   # Use Cilium LB IPAM to pin a stable IP from the Cilium LB pool.
   loadBalancerIP: ""
+  # For L2 announcements, the Service must have loadBalancerClass unset or set
+  # to io.cilium/l2-announcer to be selected for announcement.
   loadBalancerClass: "io.cilium/l2-announcer"
   annotations:
+    # Cilium LB-IPAM: request a specific IP from a CiliumLoadBalancerIPPool.
     lbipam.cilium.io/ips: "192.168.1.240"
+    # The chart creates two LoadBalancer services (TCP + UDP). They must share
+    # a single external IP.
+    lbipam.cilium.io/sharing-key: "pihole-dns"
 
 # Disable DHCP by default to avoid unexpected network impact.
 serviceDhcp:
   enabled: false
 
 serviceWeb:
-  type: ClusterIP
+  # Expose the web UI on the LAN (80/443). Without this, only DNS (port 53)
+  # is reachable on the LoadBalancer IP and http://192.168.1.240/admin will fail.
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  loadBalancerClass: "io.cilium/l2-announcer"
+  annotations:
+    # Share the same external IP as the DNS services.
+    lbipam.cilium.io/ips: "192.168.1.240"
+    lbipam.cilium.io/sharing-key: "pihole-dns"
 
 ingress:
   enabled: false
