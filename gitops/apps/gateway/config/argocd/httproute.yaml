@@ -1,19 +1,19 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: pihole
-  namespace: pihole
+  name: argocd
+  namespace: argocd
 spec:
   parentRefs:
     - name: homelab
       namespace: ingress
   hostnames:
-    - pihole.home.lab
+    - argo.home.lab
   rules:
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: pihole-web
+        - name: argocd-server
           port: 80

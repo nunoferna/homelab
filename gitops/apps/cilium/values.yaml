@@ -18,6 +18,8 @@ k8sClientRateLimit:
   burst: 40
 
 enableIPv4Masquerade: true
+ipv6:
+  enabled: true
 bpf:
   masquerade: true
 

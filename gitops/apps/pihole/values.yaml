@@ -16,9 +16,16 @@ persistentVolumeClaim:
   enabled: true
   size: "2Gi"
 
+# Required for DHCP to function on the host network
+hostNetwork: true
+capabilities:
+  add:
+    - NET_ADMIN
+
 # DNS should be reachable on your LAN on port 53.
 # Expose the DNS service as a LoadBalancer.
 serviceDns:
+  mixedService: true
   type: LoadBalancer
   # NOTE: Cilium L2 announcements is incompatible with externalTrafficPolicy=Local.
   externalTrafficPolicy: Cluster
@@ -36,7 +43,13 @@ serviceDns:
 
 # Disable DHCP by default to avoid unexpected network impact.
 serviceDhcp:
-  enabled: false
+  enabled: true
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  loadBalancerClass: "io.cilium/l2-announcer"
+  annotations:
+    lbipam.cilium.io/ips: "192.168.1.240"
+    lbipam.cilium.io/sharing-key: "pihole-dns"
 
 serviceWeb:
   # Expose the web UI on the LAN (80/443). Without this, only DNS (port 53)
@@ -54,5 +67,31 @@ ingress:
 
 # Basic Pi-hole env defaults.
 extraEnvVars:
-  FTLCONF_dns_listeningMode: "all"
   TZ: "UTC"
+  # Enable DHCP Server
+  FTLCONF_dhcp_active: true
+  FTLCONF_dhcp_start: 192.168.1.64
+  FTLCONF_dhcp_end: 192.168.1.239
+  FTLCONF_dhcp_router: 192.168.1.254
+  FTLCONF_dns_listeningMode: "LOCAL"
+  FTLCONF_dns_upstreams: |-
+    1.1.1.1
+    1.0.0.1
+    8.8.8.8
+    8.8.4.4
+    2606:4700:4700::1111
+    2606:4700:4700::1001
+  FTLCONF_dhcp_ipv6: true
+  FTLCONF_dns_interface: "eth0"
+
+# Register local DNS records for the Gateway.
+# We mount a custom dnsmasq config to support wildcard DNS (*.home.lab -> Gateway IP).
+extraVolumes:
+  custom-dns:
+    configMap:
+      name: pihole-custom-dns
+
+extraVolumeMounts:
+  custom-dns:
+    mountPath: /etc/dnsmasq.d/05-homelab.conf
+    subPath: 05-homelab.conf
