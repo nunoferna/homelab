@@ -1,11 +1,4 @@
 # Pi-hole values (homelab defaults).
-# Create a Secret named "pihole-admin" in the "pihole" namespace with key "password".
-# Example:
-# kubectl -n pihole create secret generic pihole-admin --from-literal=password='CHANGEME'
-
-# Do not use the chart's default "admin" password.
-adminPassword: ""
-
 admin:
   enabled: true
   existingSecret: pihole-admin
@@ -16,54 +9,18 @@ persistentVolumeClaim:
   enabled: true
   size: "2Gi"
 
-# Required for DHCP to function on the host network
 hostNetwork: true
 capabilities:
   add:
     - NET_ADMIN
 
-# DNS should be reachable on your LAN on port 53.
-# Expose the DNS service as a LoadBalancer.
-serviceDns:
-  mixedService: true
-  type: LoadBalancer
-  # NOTE: Cilium L2 announcements is incompatible with externalTrafficPolicy=Local.
-  externalTrafficPolicy: Cluster
-  # Use Cilium LB IPAM to pin a stable IP from the Cilium LB pool.
-  loadBalancerIP: ""
-  # For L2 announcements, the Service must have loadBalancerClass unset or set
-  # to io.cilium/l2-announcer to be selected for announcement.
-  loadBalancerClass: "io.cilium/l2-announcer"
-  annotations:
-    # Cilium LB-IPAM: request a specific IP from a CiliumLoadBalancerIPPool.
-    lbipam.cilium.io/ips: "192.168.1.240"
-    # The chart creates two LoadBalancer services (TCP + UDP). They must share
-    # a single external IP.
-    lbipam.cilium.io/sharing-key: "pihole-dns"
-
-# Disable DHCP by default to avoid unexpected network impact.
 serviceDhcp:
-  enabled: true
-  type: LoadBalancer
-  externalTrafficPolicy: Cluster
-  loadBalancerClass: "io.cilium/l2-announcer"
-  annotations:
-    lbipam.cilium.io/ips: "192.168.1.240"
-    lbipam.cilium.io/sharing-key: "pihole-dns"
-
-serviceWeb:
-  # Expose the web UI on the LAN (80/443). Without this, only DNS (port 53)
-  # is reachable on the LoadBalancer IP and http://192.168.1.240/admin will fail.
-  type: LoadBalancer
-  externalTrafficPolicy: Cluster
-  loadBalancerClass: "io.cilium/l2-announcer"
-  annotations:
-    # Share the same external IP as the DNS services.
-    lbipam.cilium.io/ips: "192.168.1.240"
-    lbipam.cilium.io/sharing-key: "pihole-dns"
-
-ingress:
   enabled: false
+
+serviceDns:
+  type: ClusterIP
+serviceWeb:
+  type: ClusterIP
 
 # Basic Pi-hole env defaults.
 extraEnvVars:
@@ -73,6 +30,7 @@ extraEnvVars:
   FTLCONF_dhcp_start: 192.168.1.64
   FTLCONF_dhcp_end: 192.168.1.239
   FTLCONF_dhcp_router: 192.168.1.254
+  FTLCONF_dns_reply_host_IPv4: 192.168.1.10
   FTLCONF_dns_listeningMode: "LOCAL"
   FTLCONF_dns_upstreams: |-
     1.1.1.1
