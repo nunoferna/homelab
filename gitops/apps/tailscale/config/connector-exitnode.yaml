@@ -4,13 +4,11 @@ metadata:
   name: exit-node
   namespace: tailscale
   annotations:
-    # Ensure this is applied after the operator/CRDs.
     argocd.argoproj.io/sync-wave: "5"
 spec:
-  # Makes this cluster advertise itself as a Tailnet exit node.
-  # You must enable an ACL auto-approver for the Connector's tags (default tag:k8s)
-  # or manually approve the exit node in the Tailscale admin console.
   exitNode: true
-  # Optional: sets the node name in your tailnet.
   hostname: homelab-exit
   replicas: 1
+  subnetRouter:
+    advertiseRoutes:
+      - "10.40.0.0/14"

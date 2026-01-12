@@ -7,5 +7,5 @@ variable "acls_external_link" {
 variable "overwrite_existing_acl" {
   description = "If true, allows overwriting the existing policy without importing it first. Use with care."
   type        = bool
-  default     = false
+  default     = true
 }

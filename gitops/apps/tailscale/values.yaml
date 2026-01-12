@@ -1,16 +1,4 @@
 # Tailscale Kubernetes operator values.
-# Create a Secret named "operator-oauth" in the "tailscale" namespace with keys:
-# - client_id
-# - client_secret
-#
-# Example:
-# kubectl -n tailscale create secret generic operator-oauth \
-#   --from-literal=client_id=... \
-#   --from-literal=client_secret=...
-
-oauth:
-  clientId: ""
-  clientSecret: ""
 
 installCRDs: true
 

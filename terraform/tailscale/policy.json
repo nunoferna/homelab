@@ -2,12 +2,22 @@
     "tagOwners": {
         "tag:k8s-operator": [
             "autogroup:admin"
+        ],
+        "tag:k8s": [
+            "tag:k8s-operator"
         ]
     },
     "autoApprovers": {
         "exitNode": [
-            "tag:k8s-operator"
-        ]
+            "tag:k8s-operator",
+            "tag:k8s"
+        ],
+        "routes": {
+            "10.40.0.0/14": [
+                "tag:k8s-operator",
+                "tag:k8s"
+            ]
+        }
     },
     "grants": [
         {
