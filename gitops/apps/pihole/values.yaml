@@ -52,6 +52,11 @@ serviceDns:
 serviceWeb:
   type: ClusterIP
 
+dnsmasq:
+  customDnsEntries:
+    - address=/argo.home.lab/192.168.1.240
+    - address=/vault.home.lab/192.168.1.240
+
 # Basic Pi-hole env defaults.
 extraEnvVars:
   TZ: "UTC"
@@ -62,22 +67,11 @@ extraEnvVars:
   FTLCONF_dhcp_router: 192.168.1.254
   FTLCONF_dns_reply_host_IPv4: 192.168.1.10
   FTLCONF_dns_listeningMode: "LOCAL"
-  FTLCONF_dns_upstreams: |-
-    1.1.1.1
-    1.0.0.1
-    2606:4700:4700::1111
-    2606:4700:4700::1001
+  FTLCONF_dns_upstreams:
+    - 1.1.1.1
+    - 1.0.0.1
+    - 2606:4700:4700::1111
+    - 2606:4700:4700::1001
   FTLCONF_dhcp_ipv6: true
   FTLCONF_dns_interface: "eth0"
-
-# Register local DNS records for the Gateway.
-# We mount a custom dnsmasq config to support wildcard DNS (*.home.lab -> Gateway IP).
-extraVolumes:
-  custom-dns:
-    configMap:
-      name: pihole-custom-dns
-
-extraVolumeMounts:
-  custom-dns:
-    mountPath: /etc/dnsmasq.d/05-homelab.conf
-    subPath: 05-homelab.conf
+  FTLCONF_dns_domain_name: "home.lab"

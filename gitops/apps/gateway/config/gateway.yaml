@@ -5,11 +5,9 @@ metadata:
   namespace: ingress
 spec:
   gatewayClassName: cilium
-  # Reserve a specific LAN IP for this Gateway so it doesn't consume the
-  # Pi-hole DNS IP (192.168.1.240).
   addresses:
     - type: IPAddress
-      value: 192.168.1.241
+      value: 192.168.1.240
   listeners:
     - name: http
       protocol: HTTP
