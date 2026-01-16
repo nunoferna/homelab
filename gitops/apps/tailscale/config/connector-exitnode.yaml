@@ -11,4 +11,4 @@ spec:
   replicas: 1
   subnetRouter:
     advertiseRoutes:
-      - "10.40.0.0/14"
+      - "192.168.1.0/24"

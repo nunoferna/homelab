@@ -181,9 +181,6 @@ kubectl -n "${VAULT_NS}" get sa vault-auth >/dev/null 2>&1 || kubectl -n "${VAUL
 kubectl get clusterrolebinding vault-auth-delegator >/dev/null 2>&1 || kubectl create clusterrolebinding vault-auth-delegator --clusterrole=system:auth-delegator --serviceaccount="${VAULT_NS}":vault-auth
 
 JWT="$(kubectl -n "${VAULT_NS}" create token vault-auth)"
-# IMPORTANT: Configure Vault using the in-cluster Kubernetes service endpoint.
-# If we use the kubeconfig server URL from the runner (often https://127.0.0.1:6443),
-# Vault inside the cluster won't be able to reach it, and ESO auth will fail.
 KUBE_HOST="https://kubernetes.default.svc:443"
 KUBE_CA_CERT_FILE="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 
