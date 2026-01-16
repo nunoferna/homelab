@@ -49,13 +49,11 @@ serviceDhcp:
 
 serviceDns:
   type: ClusterIP
-serviceWeb:
-  type: ClusterIP
 
-dnsmasq:
-  customDnsEntries:
-    - address=/argo.home.lab/192.168.1.240
-    - address=/vault.home.lab/192.168.1.240
+strategyType: Recreate
+
+DNS1: ""
+DNS2: ""
 
 # Basic Pi-hole env defaults.
 extraEnvVars:
@@ -68,11 +66,14 @@ extraEnvVars:
   FTLCONF_dns_reply_host_IPv4: 192.168.1.10
   FTLCONF_dhcp_ipv6: true
   FTLCONF_dns_listeningMode: "LOCAL"
-  FTLCONF_dns_upstreams:
-    - 1.1.1.1
-    - 1.0.0.1
-    - 2606:4700:4700::1111
-    - 2606:4700:4700::1001
+  FTLCONF_dns_upstreams: |-
+    1.1.1.1
+    1.0.0.1
+    2606:4700:4700::1111
+    2606:4700:4700::1001
+  FTLCONF_dns_hosts: |-
+    192.168.1.240 argo.home.lab
+    192.168.1.240 vault.home.lab
   FTLCONF_dns_interface: "eth0"
   FTLCONF_dns_domain_name: "home.lab"
   FTLCONF_dns_dnssec: true
