@@ -7,6 +7,7 @@ chmod +x *.sh
 chmod +x argocd/*.sh 2>/dev/null || true
 chmod +x cilium/*.sh 2>/dev/null || true
 chmod +x vault/*.sh 2>/dev/null || true
+chmod +x clients/*.sh 2>/dev/null || true
 
 # Run parts
 
@@ -56,6 +57,15 @@ until kubectl get nodes -o name 2>/dev/null | grep -q '^node/'; do
 done
 
 ./cilium/install.sh
+
+if [ -f "./clients/install-ca.sh" ]; then
+    if [ -n "${VAULT_TOKEN:-}" ] || { [ -n "${VAULT_APPROLE_ROLE_ID:-}" ] && [ -n "${VAULT_APPROLE_SECRET_ID:-}" ]; }; then
+        echo "--- [Clients] Installing homelab CA ---"
+        ./clients/install-ca.sh
+    else
+        echo "--- [Clients] Skipping CA install (missing Vault credentials) ---"
+    fi
+fi
 
 echo "--- [DNS] Waiting for CoreDNS to be Available ---"
 kubectl -n kube-system rollout status deploy/coredns --timeout=5m

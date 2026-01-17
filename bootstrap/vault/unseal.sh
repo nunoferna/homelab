@@ -10,7 +10,23 @@ set +x
 VAULT_NS="vault"
 VAULT_POD="vault-0"
 
+
 KUBECTL_TIMEOUT="${KUBECTL_TIMEOUT:-5s}"
+
+# In-cluster TLS material is mounted from the vault-server-tls secret.
+# cert-manager secrets typically contain tls.crt, tls.key, and (sometimes) ca.crt.
+VAULT_TLS_DIR_IN_POD="/vault/tls/vault-server-tls"
+VAULT_CACERT_IN_POD="${VAULT_TLS_DIR_IN_POD}/ca.crt"
+vault_cli_env() {
+  cat <<EOF
+export VAULT_ADDR=https://127.0.0.1:8200;
+if [ -s "${VAULT_CACERT_IN_POD}" ]; then
+  export VAULT_CACERT="${VAULT_CACERT_IN_POD}";
+else
+  export VAULT_SKIP_VERIFY=true;
+fi
+EOF
+}
 
 STATE_DIR="${STATE_DIR:-$HOME/.homelab/vault}"
 UNSEAL_FILE="${UNSEAL_FILE:-$STATE_DIR/vault-unseal-key}"
@@ -67,7 +83,7 @@ until kubectl -n "${VAULT_NS}" --request-timeout="${KUBECTL_TIMEOUT}" get pod "$
   sleep 2
 done
 
-until kubectl -n "${VAULT_NS}" --request-timeout="${KUBECTL_TIMEOUT}" exec "${VAULT_POD}" -- /bin/sh -lc "export VAULT_ADDR=http://127.0.0.1:8200; vault status -format=json 2>/dev/null || true" >/dev/null 2>&1; do
+until kubectl -n "${VAULT_NS}" --request-timeout="${KUBECTL_TIMEOUT}" exec "${VAULT_POD}" -- /bin/sh -lc "$(vault_cli_env); vault status -format=json 2>/dev/null || true" >/dev/null 2>&1; do
   if (( SECONDS >= deadline )); then
     echo "ERROR: Timed out waiting for Vault to respond to 'vault status'."
     dump_vault_debug
@@ -77,7 +93,7 @@ until kubectl -n "${VAULT_NS}" --request-timeout="${KUBECTL_TIMEOUT}" exec "${VA
 done
 
 echo "--- [Vault] Checking seal status ---"
-STATUS_JSON="$(kubectl -n "${VAULT_NS}" --request-timeout="${KUBECTL_TIMEOUT}" exec "${VAULT_POD}" -- /bin/sh -lc "export VAULT_ADDR=http://127.0.0.1:8200; vault status -format=json 2>/dev/null || true" || true)"
+STATUS_JSON="$(kubectl -n "${VAULT_NS}" --request-timeout="${KUBECTL_TIMEOUT}" exec "${VAULT_POD}" -- /bin/sh -lc "$(vault_cli_env); vault status -format=json 2>/dev/null || true" || true)"
 SEALED="$(printf '%s' "${STATUS_JSON}" | grep -o '"sealed"\s*:\s*[^,]*' | head -n1 | awk -F: '{gsub(/[[:space:]]/,"",$2); print $2}' || true)"
 INITIALIZED="$(printf '%s' "${STATUS_JSON}" | grep -o '"initialized"\s*:\s*[^,]*' | head -n1 | awk -F: '{gsub(/[[:space:]]/,"",$2); print $2}' || true)"
 
@@ -104,6 +120,6 @@ if [ -z "${VAULT_UNSEAL_KEY:-}" ]; then
 fi
 
 echo "--- [Vault] Unsealing ---"
-kubectl -n "${VAULT_NS}" --request-timeout="${KUBECTL_TIMEOUT}" exec -i "${VAULT_POD}" -- /bin/sh -lc "export VAULT_ADDR=http://127.0.0.1:8200; vault operator unseal '${VAULT_UNSEAL_KEY}'" >/dev/null
+kubectl -n "${VAULT_NS}" --request-timeout="${KUBECTL_TIMEOUT}" exec -i "${VAULT_POD}" -- /bin/sh -lc "$(vault_cli_env); vault operator unseal '${VAULT_UNSEAL_KEY}'" >/dev/null
 
 echo "--- [Vault] Unseal complete ---"

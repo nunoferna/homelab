@@ -7,6 +7,7 @@ spec:
   parentRefs:
     - name: homelab
       namespace: ingress
+      sectionName: https
   hostnames:
     - vault.home.lab
   rules:

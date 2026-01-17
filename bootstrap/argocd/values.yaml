@@ -2,5 +2,5 @@
 
 configs:
   params:
-    server.insecure: true
+    server.insecure: false
     reposerver.metrics.listen.address: 0.0.0.0

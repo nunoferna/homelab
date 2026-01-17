@@ -12,7 +12,23 @@ set +x
 VAULT_NS="vault"
 VAULT_POD="vault-0"
 
+
 KUBECTL_TIMEOUT="${KUBECTL_TIMEOUT:-5s}"
+
+# In-cluster TLS material is mounted from the vault-server-tls secret.
+# cert-manager secrets typically contain tls.crt, tls.key, and (sometimes) ca.crt.
+VAULT_TLS_DIR_IN_POD="/vault/tls/vault-server-tls"
+VAULT_CACERT_IN_POD="${VAULT_TLS_DIR_IN_POD}/ca.crt"
+vault_cli_env() {
+  cat <<EOF
+export VAULT_ADDR=https://127.0.0.1:8200;
+if [ -s "${VAULT_CACERT_IN_POD}" ]; then
+  export VAULT_CACERT="${VAULT_CACERT_IN_POD}";
+else
+  export VAULT_SKIP_VERIFY=true;
+fi
+EOF
+}
 
 STATE_DIR="${STATE_DIR:-$HOME/.homelab/vault}"
 CREDS_FILE="${CREDS_FILE:-$STATE_DIR/vault-approle.json}"
@@ -81,7 +97,7 @@ ensure_vault_pod() {
   done
 
   echo "--- [Vault] Waiting for vault process to accept exec ---"
-  until vault_exec_no_stdin "export VAULT_ADDR=http://127.0.0.1:8200; vault status -format=json 2>/dev/null || true" >/dev/null 2>&1; do
+  until vault_exec_no_stdin "$(vault_cli_env); vault status -format=json 2>/dev/null || true" >/dev/null 2>&1; do
     if (( SECONDS >= deadline )); then
       echo "ERROR: Timed out waiting for Vault to respond to 'vault status'."
       dump_vault_debug
@@ -93,7 +109,7 @@ ensure_vault_pod() {
 
 ensure_vault_pod
 echo "--- [Vault] Checking init/seal status ---"
-STATUS_JSON="$(vault_exec_no_stdin "export VAULT_ADDR=http://127.0.0.1:8200; vault status -format=json 2>/dev/null || true" 2>/dev/null || true)"
+STATUS_JSON="$(vault_exec_no_stdin "$(vault_cli_env); vault status -format=json 2>/dev/null || true" 2>/dev/null || true)"
 
 if ! echo "${STATUS_JSON}" | grep -q '"initialized"\s*:\s*true'; then
   echo "Vault is not initialized yet. Run ./bootstrap/vault/init-and-configure.sh once locally."
@@ -108,7 +124,7 @@ fi
 echo "--- [Vault] Logging in via AppRole ---"
 # IMPORTANT: Do not use `vault auth list` here. It requires a privileged token.
 # The only thing we can/should do in CI is attempt an AppRole login and handle errors.
-LOGIN_OUT="$(vault_exec_no_stdin "export VAULT_ADDR=http://127.0.0.1:8200; vault write -format=json auth/approle/login role_id='${VAULT_APPROLE_ROLE_ID}' secret_id='${VAULT_APPROLE_SECRET_ID}' 2>&1" || true)"
+LOGIN_OUT="$(vault_exec_no_stdin "$(vault_cli_env); vault write -format=json auth/approle/login role_id='${VAULT_APPROLE_ROLE_ID}' secret_id='${VAULT_APPROLE_SECRET_ID}' 2>&1" || true)"
 VAULT_TOKEN="$(printf '%s' "${LOGIN_OUT}" | awk -F'"' '/"client_token"/{print $4; exit}' || true)"
 
 if [ -z "${VAULT_TOKEN}" ]; then
@@ -124,9 +140,9 @@ if [ -z "${VAULT_TOKEN}" ]; then
 fi
 
 # Ensure Pi-hole password exists once.
-if ! vault_exec "export VAULT_ADDR=http://127.0.0.1:8200; export VAULT_TOKEN='${VAULT_TOKEN}'; vault kv get -format=json secret/homelab/pihole" >/dev/null 2>&1; then
+if ! vault_exec "$(vault_cli_env); export VAULT_TOKEN='${VAULT_TOKEN}'; vault kv get -format=json secret/homelab/pihole" >/dev/null 2>&1; then
   PIHOLE_PASSWORD="$(openssl rand -base64 24)"
-  vault_exec "export VAULT_ADDR=http://127.0.0.1:8200; export VAULT_TOKEN='${VAULT_TOKEN}'; vault kv put secret/homelab/pihole password='${PIHOLE_PASSWORD}'" >/dev/null
+  vault_exec "$(vault_cli_env); export VAULT_TOKEN='${VAULT_TOKEN}'; vault kv put secret/homelab/pihole password='${PIHOLE_PASSWORD}'" >/dev/null
   echo "Pi-hole password created in Vault (not printed)"
 else
   echo "Pi-hole password already present in Vault"
@@ -134,7 +150,7 @@ fi
 
 # Upsert Tailscale creds when provided.
 if [ -n "${TAILSCALE_OAUTH_CLIENT_ID:-}" ] && [ -n "${TAILSCALE_OAUTH_CLIENT_SECRET:-}" ]; then
-  vault_exec "export VAULT_ADDR=http://127.0.0.1:8200; export VAULT_TOKEN='${VAULT_TOKEN}'; vault kv put secret/homelab/tailscale client_id='${TAILSCALE_OAUTH_CLIENT_ID}' client_secret='${TAILSCALE_OAUTH_CLIENT_SECRET}'" >/dev/null
+  vault_exec "$(vault_cli_env); export VAULT_TOKEN='${VAULT_TOKEN}'; vault kv put secret/homelab/tailscale client_id='${TAILSCALE_OAUTH_CLIENT_ID}' client_secret='${TAILSCALE_OAUTH_CLIENT_SECRET}'" >/dev/null
   echo "Tailscale creds written to Vault"
 else
   echo "Skipping Tailscale creds: set TAILSCALE_OAUTH_CLIENT_ID and TAILSCALE_OAUTH_CLIENT_SECRET"

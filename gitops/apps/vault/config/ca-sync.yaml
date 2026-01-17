@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: vault-ca-sync
+  namespace: vault
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: vault-ca-read
+  namespace: cert-manager
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["homelab-ca"]
+    verbs: ["get"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: vault-ca-read
+  namespace: cert-manager
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+subjects:
+  - kind: ServiceAccount
+    name: vault-ca-sync
+    namespace: vault
+roleRef:
+  kind: Role
+  name: vault-ca-read
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: vault-ca-sync
+  namespace: vault
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          serviceAccountName: vault-ca-sync
+          restartPolicy: OnFailure
+          containers:
+            - name: sync
+              image: alpine:3.20
+              env:
+                - name: VAULT_ADDR
+                  value: "https://vault.vault.svc:8200"
+              command:
+                - /bin/sh
+                - -c
+              args:
+                - |
+                  set -euo pipefail
+                  apk add --no-cache curl jq coreutils
+
+                  SA_TOKEN="$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)"
+                  K8S_HOST="https://${KUBERNETES_SERVICE_HOST}:${KUBERNETES_SERVICE_PORT}"
+
+                  SECRET_JSON="$(curl -sS --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt \
+                    -H "Authorization: Bearer ${SA_TOKEN}" \
+                    "${K8S_HOST}/api/v1/namespaces/cert-manager/secrets/homelab-ca")"
+
+                  CA_B64="$(echo "${SECRET_JSON}" | jq -r '.data["tls.crt"]')"
+                  if [ -z "${CA_B64}" ] || [ "${CA_B64}" = "null" ]; then
+                    echo "homelab-ca secret not found or missing tls.crt"
+                    exit 1
+                  fi
+
+                  echo "${CA_B64}" | base64 -d > /tmp/homelab-ca.crt
+
+                  LOGIN_JSON="$(curl -sS --cacert /tmp/homelab-ca.crt --request POST --data "{\"role\":\"ca-sync\",\"jwt\":\"${SA_TOKEN}\"}" \
+                    "${VAULT_ADDR}/v1/auth/kubernetes/login")"
+                  VAULT_TOKEN="$(echo "${LOGIN_JSON}" | jq -r '.auth.client_token')"
+                  if [ -z "${VAULT_TOKEN}" ] || [ "${VAULT_TOKEN}" = "null" ]; then
+                    echo "Vault login failed"
+                    echo "${LOGIN_JSON}"
+                    exit 1
+                  fi
+
+                  curl -sS --cacert /tmp/homelab-ca.crt --request POST \
+                    -H "X-Vault-Token: ${VAULT_TOKEN}" \
+                    --data "{\"data\":{\"ca_pem_b64\":\"${CA_B64}\"}}" \
+                    "${VAULT_ADDR}/v1/secret/data/homelab/ca" >/dev/null

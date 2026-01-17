@@ -1,0 +1,19 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: vault-issuer
+spec:
+  vault:
+    server: https://vault.vault.svc:8200
+    path: pki/sign/home-lab
+    caBundleSecretRef:
+      name: homelab-ca
+      key: tls.crt
+    auth:
+      kubernetes:
+        role: vault-issuer
+        mountPath: /v1/auth/kubernetes
+        serviceAccountRef:
+          name: vault-issuer
+          audiences:
+            - vault://cert-manager/vault-issuer

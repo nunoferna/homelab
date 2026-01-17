@@ -1,0 +1,16 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: homelab-gateway-tls
+  namespace: ingress
+spec:
+  secretName: homelab-gateway-tls
+  issuerRef:
+    name: homelab-ca
+    kind: ClusterIssuer
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  dnsNames:
+    - "*.home.lab"
+    - "home.lab"

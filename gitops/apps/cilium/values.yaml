@@ -21,11 +21,50 @@ ipv6:
 bpf:
   masquerade: true
 
+# Encrypt pod-to-pod traffic on the wire (WireGuard).
+encryption:
+  enabled: true
+  type: wireguard
+
 # Enable Gateway API (Cilium Envoy).
 gatewayAPI:
   enabled: true
   gatewayClass:
     create: "true"
+
+# Enable service-to-service mTLS via SPIFFE/SPIRE (Cilium Mutual Authentication).
+authentication:
+  mutual:
+    spire:
+      enabled: true
+      install:
+        enabled: true
+        server:
+          podSecurityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            fsGroup: 1000
+          securityContext:
+            readOnlyRootFilesystem: false
+          initContainers:
+            - name: init-spire-socket-dir
+              image: busybox:1.37.0
+              securityContext:
+                runAsUser: 0
+                runAsGroup: 0
+                runAsNonRoot: false
+              volumeMounts:
+                - name: spire-server-socket
+                  mountPath: /tmp/spire-server/private
+              command:
+                - /bin/sh
+                - -c
+              args:
+                - |
+                  set -e
+                  mkdir -p /tmp/spire-server/private
+                  chmod 0777 /tmp/spire-server /tmp/spire-server/private
 
 # Single-node homelab: keep resource tuning minimal.
 operator:
