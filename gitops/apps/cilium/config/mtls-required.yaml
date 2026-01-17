@@ -1,0 +1,80 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: require-mtls
+  namespace: vault
+spec:
+  endpointSelector: {}
+  ingress:
+    # 1. Allow Kubelet Health Checks (Host/Node)
+    - fromEntities:
+        - host
+        - remote-node
+    # 2. Allow Gateway (Ingress Namespace)
+    #    NOTE: We must use the 'k8s:' prefix to match the Kubernetes namespace label
+    - fromEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": ingress
+    # 3. Require mTLS for all OTHER internal traffic
+    - authentication:
+        mode: required
+      fromEndpoints:
+        - matchExpressions:
+            # Only match if the namespace label exists (i.e. it is a Pod)
+            - key: "k8s:io.kubernetes.pod.namespace"
+              operator: Exists
+            # And it is NOT the ingress namespace
+            - key: "k8s:io.kubernetes.pod.namespace"
+              operator: NotIn
+              values:
+                - ingress
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: require-mtls
+  namespace: external-secrets
+spec:
+  endpointSelector: {}
+  ingress:
+    - fromEntities:
+        - host
+        - remote-node
+    - fromEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": ingress
+    - authentication:
+        mode: required
+      fromEndpoints:
+        - matchExpressions:
+            - key: "k8s:io.kubernetes.pod.namespace"
+              operator: Exists
+            - key: "k8s:io.kubernetes.pod.namespace"
+              operator: NotIn
+              values:
+                - ingress
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: require-mtls
+  namespace: argocd
+spec:
+  endpointSelector: {}
+  ingress:
+    - fromEntities:
+        - host
+        - remote-node
+    - fromEndpoints:
+        - matchLabels:
+            "k8s:io.kubernetes.pod.namespace": ingress
+    - authentication:
+        mode: required
+      fromEndpoints:
+        - matchExpressions:
+            - key: "k8s:io.kubernetes.pod.namespace"
+              operator: Exists
+            - key: "k8s:io.kubernetes.pod.namespace"
+              operator: NotIn
+              values:
+                - ingress

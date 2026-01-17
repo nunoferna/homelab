@@ -6,15 +6,15 @@ concurrency:
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     paths:
-      - 'bootstrap/**'
+      - "bootstrap/**"
   workflow_dispatch:
 
 jobs:
   bootstrap-host:
     runs-on: self-hosted
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6
