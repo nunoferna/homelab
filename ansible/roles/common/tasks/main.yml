@@ -1,0 +1,9 @@
+---
+
+- name: Include package installation tasks
+  ansible.builtin.include_tasks: packages.yml
+  tags: [packages, common]
+
+- name: Include directory setup tasks
+  ansible.builtin.include_tasks: directories.yml
+  tags: [directories, common]

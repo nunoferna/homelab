@@ -1,0 +1,15 @@
+---
+# Kubernetes configuration
+kubeconfig_path: "{{ ansible_env.HOME }}/.kube/config"
+k8s_wait_timeout: 600
+k8s_api_retries: 150
+k8s_api_delay: 2
+
+# DNS configuration
+dns_test_image: "busybox:1.36"
+dns_test_timeout: 300
+coredns_namespace: kube-system
+
+# Package versions
+helm_version: latest
+k3s_version: latest

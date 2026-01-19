@@ -1,0 +1,3 @@
+---
+
+k8s_verify_node_ready_timeout: 10m

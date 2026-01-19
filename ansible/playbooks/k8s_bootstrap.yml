@@ -1,0 +1,55 @@
+---
+
+- name: Bootstrap Kubernetes
+  hosts: k8s_bootstrap
+  gather_facts: true
+
+  pre_tasks:
+    - name: Display bootstrap information
+      ansible.builtin.debug:
+        msg:
+          - "Starting bootstrap on {{ ansible_hostname }}"
+          - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
+          - "User: {{ ansible_user_id }}"
+      tags: always
+
+    - name: Assert running on supported OS
+      ansible.builtin.assert:
+        that:
+          - ansible_os_family == "Debian"
+          - ansible_distribution_version is version('13', '>=')
+        fail_msg: "This playbook requires Debian 13.0 or newer"
+        success_msg: "OS check passed"
+      tags: always
+
+  roles:
+    - role: common
+      tags: [common, base]
+
+    - role: helm
+      tags: [helm, tools]
+
+    - role: k3s
+      tags: [k3s, kubernetes]
+
+    - role: cilium
+      tags: [cilium, networking]
+
+    - role: k8s_verify
+      tags: [verify, validation]
+
+  post_tasks:
+    - name: Display final cluster status
+      ansible.builtin.command: kubectl get nodes -o wide
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: final_status
+      changed_when: false
+      tags: always
+
+    - name: Bootstrap complete
+      ansible.builtin.debug:
+        msg:
+          - "✓ Bootstrap completed successfully"
+          - "{{ final_status.stdout_lines }}"
+      tags: always

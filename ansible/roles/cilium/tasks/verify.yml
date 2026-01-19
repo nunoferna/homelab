@@ -1,0 +1,40 @@
+---
+- name: Wait for Cilium DaemonSet rollout
+  ansible.builtin.command: >
+    kubectl -n {{ cilium_namespace }} rollout status
+    ds/{{ cilium_daemonset }} --timeout={{ cilium_rollout_timeout }}
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  changed_when: false
+  tags: verify
+
+- name: Wait for Cilium Operator Deployment rollout
+  ansible.builtin.command: >
+    kubectl -n {{ cilium_namespace }} rollout status
+    deploy/{{ cilium_operator_deployment }} --timeout={{ cilium_rollout_timeout }}
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  changed_when: false
+  tags: verify
+
+- name: Count running Cilium pods
+  ansible.builtin.shell: >
+    kubectl get pods -n {{ cilium_namespace }}
+    -l k8s-app=cilium --no-headers | wc -l
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: cilium_pod_count_result
+  changed_when: false
+  tags: verify
+
+- name: Include CoreDNS verification tasks
+  ansible.builtin.include_tasks: coredns.yml
+  tags: [verify, dns]
+
+- name: Display Cilium verification status
+  ansible.builtin.debug:
+    msg:
+      - "✓ Cilium installed and ready"
+      - "Running Cilium pods: {{ cilium_pod_count_result.stdout | trim }}"
+      - "✓ DNS resolution working"
+  tags: verify

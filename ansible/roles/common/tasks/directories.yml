@@ -1,0 +1,9 @@
+---
+
+- name: Ensure .kube directory exists
+  ansible.builtin.file:
+    path: "{{ ansible_env.HOME }}/.kube"
+    state: directory
+    mode: "{{ common_kube_directory_mode }}"
+    owner: "{{ ansible_user_id }}"
+  tags: directories

@@ -1,0 +1,13 @@
+---
+
+common_packages:
+  - curl
+  - git
+  - jq
+  - unzip
+  - openssl
+  - apt-transport-https
+  - gpg
+
+common_apt_update_cache_valid_time: 3600
+common_kube_directory_mode: "0755"

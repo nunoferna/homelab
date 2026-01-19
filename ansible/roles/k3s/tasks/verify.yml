@@ -1,0 +1,47 @@
+---
+- name: Wait for Kubernetes API to be responsive
+  ansible.builtin.command: kubectl version --request-timeout=5s
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  register: k3s_kubectl_api
+  until: k3s_kubectl_api.rc == 0
+  retries: "{{ k8s_api_retries }}"
+  delay: "{{ k8s_api_delay }}"
+  changed_when: false
+  tags: verify
+
+- name: Wait for node resource to appear
+  ansible.builtin.command: kubectl get nodes -o name
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  register: k3s_k8s_nodes
+  until: k3s_k8s_nodes.stdout is search('node/')
+  retries: "{{ k8s_api_retries }}"
+  delay: "{{ k8s_api_delay }}"
+  changed_when: false
+  tags: verify
+
+- name: Get k3s node information
+  ansible.builtin.command: kubectl get nodes -o wide
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  register: k3s_node_info
+  changed_when: false
+  tags: verify
+
+- name: Display k3s node status
+  ansible.builtin.debug:
+    var: k3s_node_info.stdout_lines
+  tags: verify
+
+- name: Verify k3s service is active
+  ansible.builtin.systemd:
+    name: "{{ k3s_service_name }}"
+    state: started
+  register: k3s_service_status
+  tags: verify
+
+- name: Display k3s service status
+  ansible.builtin.debug:
+    msg: "K3s service is {{ k3s_service_status.status.ActiveState }}"
+  tags: verify

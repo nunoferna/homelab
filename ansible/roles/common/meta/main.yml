@@ -1,0 +1,18 @@
+---
+
+galaxy_info:
+  author: Nuno Fernandes
+  description: Common system packages and configuration for Kubernetes
+  company: NOF Homelab
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Debian
+      versions:
+        - all
+  galaxy_tags:
+    - system
+    - common
+    - kubernetes
+
+dependencies: []

@@ -1,0 +1,17 @@
+---
+
+k3s_binary_path: /usr/local/bin/k3s
+k3s_service_name: k3s
+k3s_kubeconfig: "{{ kubeconfig_path }}"
+
+# K3s configuration
+k3s_config_dir: /etc/rancher/k3s
+k3s_config_file: "{{ k3s_config_dir }}/config.yaml"
+k3s_system_kubeconfig: /etc/rancher/k3s/k3s.yaml
+k3s_install_url: https://get.k3s.io
+
+# Raspberry Pi specific
+k3s_rpi_cmdline_paths:
+  - /boot/firmware/cmdline.txt
+  - /boot/cmdline.txt
+k3s_rpi_cgroup_params: "cgroup_memory=1 cgroup_enable=memory"

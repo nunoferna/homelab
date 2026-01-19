@@ -1,0 +1,78 @@
+---
+- name: Check if running on Raspberry Pi
+  ansible.builtin.shell: |
+    grep -q "Raspberry Pi" /proc/cpuinfo 2>/dev/null || test -f /etc/rpi-issue
+  register: k3s_is_raspberry_pi
+  changed_when: false
+  failed_when: false
+  tags: raspberry_pi
+
+- name: Raspberry Pi configuration
+  when: k3s_is_raspberry_pi.rc == 0
+  block:
+    - name: Find cmdline.txt location
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      register: k3s_cmdline_check
+      loop: "{{ rpi_cmdline_paths }}"
+      tags: raspberry_pi
+
+    - name: Set cmdline path
+      ansible.builtin.set_fact:
+        k3s_rpi_cmdline_path: "{{ item.stat.path }}"
+      when: item.stat.exists
+      loop: "{{ k3s_cmdline_check.results }}"
+      loop_control:
+        label: "{{ item.item }}"
+      tags: raspberry_pi
+
+    - name: Check if cgroups are already enabled
+      ansible.builtin.shell: |
+        grep -q "{{ k3s_rpi_cgroup_params }}" "{{ k3s_rpi_cmdline_path }}"
+      register: k3s_cgroups_enabled
+      changed_when: false
+      failed_when: false
+      when: k3s_rpi_cmdline_path is defined
+      tags: raspberry_pi
+
+    - name: Backup cmdline.txt
+      ansible.builtin.copy:
+        src: "{{ k3s_rpi_cmdline_path }}"
+        dest: "{{ k3s_rpi_cmdline_path }}.bak"
+        remote_src: true
+        mode: preserve
+      when:
+        - k3s_rpi_cmdline_path is defined
+        - k3s_cgroups_enabled.rc != 0
+      tags: raspberry_pi
+
+    - name: Enable cgroups in cmdline.txt
+      ansible.builtin.lineinfile:
+        path: "{{ k3s_rpi_cmdline_path }}"
+        backrefs: true
+        regexp: "^(.*?)$"
+        line: '\1 {{ k3s_rpi_cgroup_params }}'
+        state: present
+      when:
+        - k3s_rpi_cmdline_path is defined
+        - k3s_cgroups_enabled.rc != 0
+      register: k3s_cgroups_modified
+      tags: raspberry_pi
+
+    - name: Display reboot requirement message
+      ansible.builtin.fail:
+        msg: |
+          !!! REBOOT REQUIRED !!!
+          Cgroups have been enabled in {{ k3s_rpi_cmdline_path }}.
+          You MUST reboot your Raspberry Pi for this to take effect.
+          After reboot, run this playbook again.
+      when:
+        - k3s_cgroups_modified is defined
+        - k3s_cgroups_modified.changed
+      tags: raspberry_pi
+
+    - name: Ensure iptables is installed on Raspberry Pi
+      ansible.builtin.apt:
+        name: "{{ k3s_required_packages }}"
+        state: present
+      tags: raspberry_pi

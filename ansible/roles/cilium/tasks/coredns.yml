@@ -1,0 +1,66 @@
+---
+- name: Wait for CoreDNS deployment
+  ansible.builtin.command: >
+    kubectl -n {{ cilium_namespace }} rollout status
+    deploy/coredns --timeout=5m
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  changed_when: false
+  tags: dns
+
+- name: Test in-cluster DNS resolution
+  ansible.builtin.command: >
+    kubectl run dns-test --rm -i --restart=Never
+    --image=busybox:1.36 --command -- nslookup github.com
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: cilium_dns_test
+  changed_when: false
+  failed_when: false
+  tags: dns
+
+- name: Handle DNS test failure
+  when: cilium_dns_test.rc != 0
+  block:
+    - name: Get CoreDNS logs
+      ansible.builtin.command: >
+        kubectl -n {{ cilium_namespace }} logs
+        deploy/coredns --tail=120
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: cilium_coredns_logs
+      changed_when: false
+      failed_when: false
+      tags: dns
+
+    - name: Get CoreDNS ConfigMap
+      ansible.builtin.command: >
+        kubectl -n {{ cilium_namespace }} get cm coredns -o yaml
+      environment:
+        KUBECONFIG: "{{ kubeconfig_path }}"
+      register: cilium_coredns_config
+      changed_when: false
+      failed_when: false
+      tags: dns
+
+    - name: Display CoreDNS diagnostic information
+      ansible.builtin.debug:
+        msg:
+          - "Recent CoreDNS Logs:"
+          - "{{ cilium_coredns_logs.stdout }}"
+      tags: dns
+
+    - name: Fail with diagnostic message
+      ansible.builtin.fail:
+        msg: |
+          DNS resolution test failed!
+
+          Hint: Check if pod egress NAT/masquerade is configured correctly.
+          This is usually a Cilium CNI configuration issue.
+          Review the CoreDNS logs above for details.
+      tags: dns
+
+- name: Display DNS verification success
+  ansible.builtin.debug:
+    msg: "✓ CoreDNS is operational and DNS resolution is working"
+  tags: dns

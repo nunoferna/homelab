@@ -1,0 +1,4 @@
+---
+
+k3s_required_packages:
+  - iptables

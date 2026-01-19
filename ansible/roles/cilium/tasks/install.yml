@@ -1,0 +1,49 @@
+---
+- name: Check if Cilium values file exists
+  ansible.builtin.stat:
+    path: "{{ cilium_values_file }}"
+  register: cilium_values_stat
+  tags: install
+
+- name: Fail if Cilium values file not found
+  ansible.builtin.fail:
+    msg: "Cilium values file not found: {{ cilium_values_file }}"
+  when: not cilium_values_stat.stat.exists
+  tags: install
+
+- name: Add Cilium Helm repository
+  ansible.builtin.command: >
+    helm repo add {{ cilium_chart_repo_name }} {{ cilium_chart_repo_url }}
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: helm_repo_add
+  changed_when: "'has been added' in helm_repo_add.stdout"
+  failed_when:
+    - helm_repo_add.rc != 0
+    - "'already exists' not in helm_repo_add.stderr"
+  tags: install
+
+- name: Update Helm repositories
+  ansible.builtin.command: helm repo update
+  changed_when: false
+  tags: install
+
+- name: Install Cilium via Helm
+  ansible.builtin.command: >
+    helm upgrade --install {{ cilium_release_name }}
+    {{ cilium_chart_repo_name }}/cilium
+    --namespace {{ cilium_namespace }}
+    --version {{ cilium_chart_version }}
+    -f {{ cilium_values_file }}
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: cilium_helm_install
+  changed_when: >
+    'has been upgraded' in cilium_helm_install.stdout or
+    'has been installed' in cilium_helm_install.stdout
+  tags: install
+
+- name: Display Cilium installation status
+  ansible.builtin.debug:
+    msg: "Cilium {{ cilium_chart_version }} installed in {{ cilium_namespace }} namespace"
+  tags: install
