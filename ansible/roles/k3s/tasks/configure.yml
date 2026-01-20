@@ -19,7 +19,6 @@
 - name: Display configuration deployment status
   ansible.builtin.debug:
     msg:
-      - "k3s configuration deployed: {{ k3s_config_deployed.changed }}"
+      - "k3s configuration: {{ 'deployed' if k3s_config_deployed.changed else 'unchanged' }}"
       - "config file: {{ k3s_config_file }}"
-  when: k3s_config_deployed.changed
   tags: config

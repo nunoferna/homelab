@@ -2,7 +2,7 @@
 
 - name: Wait for all nodes to be ready
   ansible.builtin.command: >
-    kubectl wait --for=condition=Ready node --all --timeout=10m
+    kubectl wait --for=condition=Ready node --all --timeout={{ k8s_verify_node_ready_timeout }}
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
   changed_when: false
@@ -17,7 +17,7 @@
   tags: verify
 
 - name: Get all cluster resources
-  ansible.builtin.command: kubectl get all -A
+  ansible.builtin.command: kubectl get all -A -o wide
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"
   register: k8s_verify_cluster_resources

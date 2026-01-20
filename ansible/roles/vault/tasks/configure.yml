@@ -1,0 +1,149 @@
+---
+- name: Read root token
+  ansible.builtin.shell: >
+    jq -r '.root_token' {{ vault_init_file }}
+  register: vault_root_token_output
+  changed_when: false
+  no_log: true
+  tags: configure
+
+- name: Set root token fact
+  ansible.builtin.set_fact:
+    vault_root_token: "{{ vault_root_token_output.stdout }}"
+  no_log: true
+  tags: configure
+
+- name: Enable KV v2 secrets engine
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault secrets enable -path=secret kv-v2
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: vault_kv_enable
+  changed_when: "'Success' in vault_kv_enable.stdout"
+  failed_when:
+    - vault_kv_enable.rc != 0
+    - "'path is already in use' not in vault_kv_enable.stderr"
+  tags: configure
+
+- name: Create Vault policies
+  ansible.builtin.shell: >
+    kubectl exec -i {{ vault_pod }} -n {{ vault_namespace }}
+    -- sh -c "cat > /tmp/{{ item.key }}.hcl <<'EOF'
+    {{ item.value.content }}
+    EOF
+    vault policy write {{ item.key }} /tmp/{{ item.key }}.hcl"
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  loop: "{{ vault_policies | dict2items }}"
+  register: vault_policy_result
+  changed_when: "'Success' in vault_policy_result.stdout"
+  tags: configure
+
+- name: Enable Kubernetes auth method
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault auth enable kubernetes
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: vault_k8s_auth_enable
+  changed_when: "'Success' in vault_k8s_auth_enable.stdout"
+  failed_when:
+    - vault_k8s_auth_enable.rc != 0
+    - "'path is already in use' not in vault_k8s_auth_enable.stderr"
+  tags: configure
+
+- name: Configure Kubernetes auth
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault write auth/kubernetes/config
+    kubernetes_host="https://kubernetes.default.svc:443"
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: vault_k8s_auth_config
+  changed_when: "'Success' in vault_k8s_auth_config.stdout"
+  tags: configure
+
+- name: Enable AppRole auth method
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault auth enable approle
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: vault_approle_enable
+  changed_when: "'Success' in vault_approle_enable.stdout"
+  failed_when:
+    - vault_approle_enable.rc != 0
+    - "'path is already in use' not in vault_approle_enable.stderr"
+  tags: configure
+
+- name: Create AppRole for CI
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault write auth/approle/role/homelab-ci
+    token_policies=homelab-writer
+    token_ttl=1h
+    token_max_ttl=24h
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: vault_approle_create
+  changed_when: "'Success' in vault_approle_create.stdout"
+  tags: configure
+
+- name: Get AppRole role ID
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault read -format=json auth/approle/role/homelab-ci/role-id
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: vault_approle_role_id
+  changed_when: false
+  tags: configure
+
+- name: Generate AppRole secret ID
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault write -format=json -f auth/approle/role/homelab-ci/secret-id
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+    VAULT_TOKEN: "{{ vault_root_token }}"
+  register: vault_approle_secret_id
+  changed_when: false
+  tags: configure
+
+- name: Save AppRole credentials
+  ansible.builtin.copy:
+    content: |
+      {
+        "role_id": "{{ (vault_approle_role_id.stdout | from_json).data.role_id }}",
+        "secret_id": "{{ (vault_approle_secret_id.stdout | from_json).data.secret_id }}"
+      }
+    dest: "{{ vault_approle_file }}"
+    mode: "0600"
+  tags: configure
+
+- name: Display configuration status
+  ansible.builtin.debug:
+    msg:
+      - "✓ Vault configured"
+      - "✓ KV v2 enabled at secret/"
+      - "✓ Policies created"
+      - "✓ Kubernetes auth enabled"
+      - "✓ AppRole auth enabled"
+      - "AppRole credentials: {{ vault_approle_file }}"
+  tags: configure

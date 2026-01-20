@@ -30,37 +30,6 @@ jobs:
           kubectl version --client=true
           kubectl get nodes
 
-      - name: Ensure scripts executable
-        run: |
-          chmod +x bootstrap/argocd/install.sh
-          chmod +x bootstrap/vault/*.sh
-
-      - name: Install / Upgrade Argo CD
-        run: |
-          ./bootstrap/argocd/install.sh
-
-      - name: Init/Configure Vault (idempotent)
-        run: |
-          ./bootstrap/vault/init-and-configure.sh
-
-      - name: Wait for Vault pod
-        shell: bash
-        run: |
-          set -euo pipefail
-          for i in {1..60}; do
-            if kubectl -n vault get pod vault-0 >/dev/null 2>&1; then
-              exit 0
-            fi
-            echo "Waiting for vault-0 to exist... ($i/60)"
-            sleep 10
-          done
-          echo "Timed out waiting for vault-0"
-          exit 1
-
-      - name: Unseal Vault
-        run: |
-          ./bootstrap/vault/unseal.sh
-
       - name: Push secrets into Vault
         env:
           TAILSCALE_OAUTH_CLIENT_ID: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}

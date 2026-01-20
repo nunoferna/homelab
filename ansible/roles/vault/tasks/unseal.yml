@@ -1,0 +1,42 @@
+---
+- name: Check if Vault is sealed
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault status -format=json
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+  register: vault_seal_status
+  changed_when: false
+  failed_when: false
+  tags: unseal
+
+- name: Parse seal status
+  ansible.builtin.set_fact:
+    vault_sealed: "{{ (vault_seal_status.stdout | from_json).sealed }}"
+  when: vault_seal_status.rc == 0 or vault_seal_status.rc == 2
+  tags: unseal
+
+- name: Read unseal key
+  ansible.builtin.slurp:
+    src: "{{ vault_unseal_file }}"
+  register: vault_unseal_key_content
+  when: vault_sealed | default(true)
+  tags: unseal
+
+- name: Unseal Vault
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault operator unseal {{ vault_unseal_key_content.content | b64decode | trim }}
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+  when: vault_sealed | default(true)
+  register: vault_unseal_result
+  changed_when: "'Sealed: false' in vault_unseal_result.stdout"
+  tags: unseal
+
+- name: Display unseal status
+  ansible.builtin.debug:
+    msg: "{{ 'Vault unsealed' if vault_sealed | default(true) else 'Vault already unsealed' }}"
+  tags: unseal

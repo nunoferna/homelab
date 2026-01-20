@@ -1,0 +1,13 @@
+---
+
+- name: Include ArgoCD installation tasks
+  ansible.builtin.include_tasks: install.yml
+  tags: [argocd, install]
+
+- name: Include GitOps bootstrap tasks
+  ansible.builtin.include_tasks: bootstrap.yml
+  tags: [argocd, gitops, bootstrap]
+
+- name: Include ArgoCD verification tasks
+  ansible.builtin.include_tasks: verify.yml
+  tags: [argocd, verify]

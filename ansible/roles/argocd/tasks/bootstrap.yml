@@ -1,0 +1,53 @@
+---
+- name: Create temporary directory for GitOps manifests
+  ansible.builtin.file:
+    path: "{{ argocd_gitops_temp_dir }}"
+    state: directory
+    mode: "0755"
+  tags: bootstrap
+
+- name: Copy infrastructure App of Apps
+  ansible.builtin.copy:
+    src: infrastructure-apps.yaml
+    dest: "{{ argocd_gitops_temp_dir }}/infrastructure-apps.yaml"
+    mode: "0644"
+  tags: bootstrap
+
+- name: Copy application App of Apps
+  ansible.builtin.copy:
+    src: application-apps.yaml
+    dest: "{{ argocd_gitops_temp_dir }}/application-apps.yaml"
+    mode: "0644"
+  tags: bootstrap
+
+- name: Apply infrastructure App of Apps
+  ansible.builtin.command: >
+    kubectl apply -f {{ argocd_gitops_temp_dir }}/infrastructure-apps.yaml
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: argocd_infra_app
+  changed_when: "'created' in argocd_infra_app.stdout or 'configured' in argocd_infra_app.stdout"
+  tags: bootstrap
+
+- name: Apply application App of Apps
+  ansible.builtin.command: >
+    kubectl apply -f {{ argocd_gitops_temp_dir }}/application-apps.yaml
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: argocd_app_app
+  changed_when: "'created' in argocd_app_app.stdout or 'configured' in argocd_app_app.stdout"
+  tags: bootstrap
+
+- name: Remove temporary GitOps manifests
+  ansible.builtin.file:
+    path: "{{ argocd_gitops_temp_dir }}"
+    state: absent
+  tags: bootstrap
+
+- name: Display GitOps bootstrap status
+  ansible.builtin.debug:
+    msg:
+      - "✓ Infrastructure App of Apps deployed"
+      - "✓ Application App of Apps deployed"
+      - "ArgoCD will now manage: Cilium, Gateway, Cert-Manager, Vault"
+  tags: bootstrap

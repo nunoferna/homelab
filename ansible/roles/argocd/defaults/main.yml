@@ -1,0 +1,11 @@
+---
+
+argocd_namespace: argocd
+argocd_version: stable
+argocd_install_url: >-
+  https://raw.githubusercontent.com/argoproj/argo-cd/{{
+  argocd_version }}/manifests/install.yaml
+argocd_server_insecure: true
+argocd_wait_timeout: 300s
+
+argocd_gitops_temp_dir: /tmp/argocd-bootstrap

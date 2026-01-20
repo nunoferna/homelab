@@ -1,0 +1,26 @@
+---
+
+- name: Wait for Vault pod to be running
+  ansible.builtin.command: >
+    kubectl get pod {{ vault_pod }} -n {{ vault_namespace }}
+    -o jsonpath='{.status.phase}'
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: vault_pod_status
+  until: vault_pod_status.stdout == "Running"
+  retries: 60
+  delay: 5
+  changed_when: false
+  tags: [vault, init]
+
+- name: Include Vault initialization tasks
+  ansible.builtin.include_tasks: init.yml
+  tags: [vault, init]
+
+- name: Include Vault unseal tasks
+  ansible.builtin.include_tasks: unseal.yml
+  tags: [vault, unseal]
+
+- name: Include Vault configuration tasks
+  ansible.builtin.include_tasks: configure.yml
+  tags: [vault, configure]

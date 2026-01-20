@@ -1,0 +1,6 @@
+server:
+  service:
+    type: ClusterIP
+
+ui:
+  enabled: true

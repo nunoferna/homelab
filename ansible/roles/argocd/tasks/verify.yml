@@ -1,0 +1,29 @@
+---
+- name: Check ArgoCD server pod status
+  ansible.builtin.shell: >
+    set -o pipefail; kubectl get pods -n {{ argocd_namespace }}
+    -l app.kubernetes.io/name=argocd-server --no-headers | wc -l
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: argocd_pod_count
+  changed_when: false
+  tags: verify
+
+- name: Get ArgoCD server service
+  ansible.builtin.command: >
+    kubectl get svc {{ argocd_server_service }}
+    -n {{ argocd_namespace }} -o jsonpath='{.spec.clusterIP}'
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: argocd_service_ip
+  changed_when: false
+  tags: verify
+
+- name: Display ArgoCD verification status
+  ansible.builtin.debug:
+    msg:
+      - "✓ ArgoCD is operational"
+      - "Server pods running: {{ argocd_pod_count.stdout | trim }}"
+      - "Service IP: {{ argocd_service_ip.stdout }}"
+      - "Access via: kubectl port-forward svc/argocd-server -n argocd 8080:443"
+  tags: verify

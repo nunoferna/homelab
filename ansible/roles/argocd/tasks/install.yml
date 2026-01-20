@@ -1,0 +1,63 @@
+---
+- name: Create ArgoCD namespace
+  ansible.builtin.command: kubectl create namespace {{ argocd_namespace }}
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: argocd_create_ns
+  changed_when: "'created' in argocd_create_ns.stdout"
+  failed_when:
+    - argocd_create_ns.rc != 0
+    - "'already exists' not in argocd_create_ns.stderr"
+  tags: install
+
+- name: Install ArgoCD
+  ansible.builtin.command: >
+    kubectl apply -n {{ argocd_namespace }} -f {{ argocd_install_url }}
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: argocd_install
+  changed_when: >
+    'created' in argocd_install.stdout or
+    'configured' in argocd_install.stdout
+  tags: install
+
+- name: Wait for ArgoCD server deployment to be created
+  ansible.builtin.command: >
+    kubectl get deployment {{ argocd_server_deployment }}
+    -n {{ argocd_namespace }}
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: deployment_exists
+  until: deployment_exists.rc == 0
+  retries: 30
+  delay: 2
+  changed_when: false
+  tags: install
+
+- name: Configure ArgoCD server to disable internal TLS
+  ansible.builtin.command: >
+    kubectl patch configmap argocd-cmd-params-cm
+    -n {{ argocd_namespace }}
+    --type merge
+    -p '{"data":{"server.insecure":"true"}}'
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: argocd_patch_cm
+  changed_when: "'patched' in argocd_patch_cm.stdout or 'configured' in argocd_patch_cm.stdout"
+  when: argocd_server_insecure
+  tags: install
+
+- name: Wait for ArgoCD server deployment
+  ansible.builtin.command: >
+    kubectl wait --for=condition=available
+    deployment/{{ argocd_server_deployment }}
+    -n {{ argocd_namespace }} --timeout={{ argocd_wait_timeout }}
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  changed_when: false
+  tags: install
+
+- name: Display ArgoCD installation status
+  ansible.builtin.debug:
+    msg: "✓ ArgoCD installed in {{ argocd_namespace }} namespace"
+  tags: install

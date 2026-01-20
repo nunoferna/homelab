@@ -1,0 +1,18 @@
+# Managed by Ansible - do not edit manually
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    {{ network_interface }}:
+      dhcp4: false
+      dhcp6: false
+      addresses:
+        - {{ network_ipv4_address }}/{{ network_ipv4_prefix }}
+        - {{ network_ipv6_address }}/{{ network_ipv6_prefix }}
+      routes:
+        - to: default
+          via: {{ network_gateway }}
+      nameservers:
+        addresses:
+          - 127.0.0.1  # Pi-hole on localhost
+          - {{ network_gateway }}  # Fallback to router

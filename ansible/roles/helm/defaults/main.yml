@@ -1,7 +1,0 @@
----
-
-helm_gpg_key_url: https://packages.buildkite.com/helm-linux/helm-debian/gpgkey
-helm_gpg_key_path: /usr/share/keyrings/helm.gpg
-helm_repo_url: https://packages.buildkite.com/helm-linux/helm-debian/any/
-helm_apt_repo: "deb [signed-by={{ helm_gpg_key_path }}] {{ helm_repo_url }} any main"
-helm_temp_key_path: /tmp/helm.asc
