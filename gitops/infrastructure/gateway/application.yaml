@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: namespaces
+  name: gateway
   namespace: argocd
   annotations:
-    argocd.argoproj.io/sync-wave: "-5"
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   project: default
   source:
     repoURL: https://github.com/nunoferna/homelab.git
     targetRevision: main
-    path: gitops/apps/namespaces/config
+    path: gitops/infrastructure/gateway
   destination:
     server: https://kubernetes.default.svc
-    namespace: kube-system
+    namespace: gateway-infra
   syncPolicy:
     automated:
       prune: true
