@@ -1,0 +1,50 @@
+---
+
+- name: Ensure NetworkManager is installed
+  ansible.builtin.apt:
+    name: network-manager
+    state: present
+    update_cache: true
+  tags: network
+  become: true
+
+- name: Detect primary network interface
+  ansible.builtin.shell: |
+    set -o pipefail
+    ip route | grep default | awk '{print $5}' | head -n1
+  register: network_detected_interface
+  changed_when: false
+  tags: network
+
+- name: Set network interface fact
+  ansible.builtin.set_fact:
+    network_interface: "{{ network_detected_interface.stdout }}"
+  tags: network
+
+- name: Configure static IP with NetworkManager
+  community.general.nmcli:
+    conn_name: "static-{{ network_interface }}"
+    ifname: "{{ network_interface }}"
+    type: ethernet
+    ip4: "{{ network_ipv4_address }}/{{ network_ipv4_prefix }}"
+    gw4: "{{ network_gateway }}"
+    dns4: "127.0.0.1,{{ network_gateway }}"
+    ip6: "{{ network_ipv6_address }}/{{ network_ipv6_prefix }}"
+    state: present
+    autoconnect: true
+  tags: network
+  become: true
+
+- name: Activate connection
+  ansible.builtin.command: nmcli connection up "static-{{ network_interface }}"
+  changed_when: true
+  tags: network
+
+- name: Display network configuration
+  ansible.builtin.debug:
+    msg:
+      - "Interface: {{ network_interface }}"
+      - "IPv4: {{ network_ipv4_address }}/{{ network_ipv4_prefix }}"
+      - "IPv6: {{ network_ipv6_address }}/{{ network_ipv6_prefix }}"
+      - "Gateway: {{ network_gateway }}"
+  tags: network

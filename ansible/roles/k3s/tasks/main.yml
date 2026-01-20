@@ -30,3 +30,40 @@
 - name: Include k3s verification tasks
   ansible.builtin.include_tasks: verify.yml
   tags: [k3s, verify]
+
+- name: Wait for k3s to be ready
+  ansible.builtin.command: k3s kubectl wait --for=condition=Ready node --all --timeout=300s
+  changed_when: false
+  tags: k3s
+
+- name: Add Cilium Helm repository
+  kubernetes.core.helm_repository:
+    name: cilium
+    repo_url: https://helm.cilium.io/
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  tags: [k3s, cilium]
+
+- name: Install Cilium CNI (required before ArgoCD)
+  kubernetes.core.helm:
+    name: cilium
+    chart_ref: cilium/cilium
+    release_namespace: kube-system
+    create_namespace: false
+    values:
+      ipam:
+        mode: "kubernetes"
+      k8sServiceHost: "127.0.0.1"
+      k8sServicePort: "6443"
+      kubeProxyReplacement: "true"
+      routingMode: "native"
+      autoDirectNodeRoutes: true
+      ipv4NativeRoutingCIDR: 10.42.0.0/16
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  tags: [k3s, cilium]
+
+- name: Wait for Cilium to be ready
+  ansible.builtin.command: k3s kubectl -n kube-system rollout status ds/cilium --timeout=300s
+  changed_when: false
+  tags: [k3s, cilium]

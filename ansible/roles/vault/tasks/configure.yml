@@ -1,0 +1,28 @@
+---
+- name: Read root token
+  ansible.builtin.shell: >
+    jq -r '.root_token' {{ vault_init_file }}
+  register: vault_root_token_output
+  changed_when: false
+  no_log: true
+  tags: configure
+
+- name: Create Vault root token Secret
+  ansible.builtin.shell: >
+    set -o pipefail; kubectl create secret generic vault-root-token
+    -n {{ vault_namespace }}
+    --from-literal=token={{ vault_root_token_output.stdout }}
+    --dry-run=client -o yaml | kubectl apply -f -
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+  register: vault_secret_result
+  changed_when: "'created' in vault_secret_result.stdout or 'configured' in vault_secret_result.stdout"
+  no_log: true
+  tags: configure
+
+- name: Display configuration status
+  ansible.builtin.debug:
+    msg:
+      - "✓ Root token stored in Kubernetes Secret"
+      - "✓ GitOps will handle Vault configuration"
+  tags: configure

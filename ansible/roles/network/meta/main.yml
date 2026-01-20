@@ -2,7 +2,7 @@
 
 galaxy_info:
   author: Nuno Fernandes
-  description: Kubernetes cluster health verification
+  description: Static network configuration for Raspberry Pi
   license: MIT
   min_ansible_version: "2.14"
   platforms:
@@ -10,9 +10,10 @@ galaxy_info:
       versions:
         - all
   galaxy_tags:
-    - kubernetes
-    - verification
+    - network
+    - networking
 
-dependencies:
-  - role: k3s
-  - role: argocd
+dependencies: []
+
+collections:
+  - community.general

@@ -1,0 +1,8 @@
+server:
+  standalone:
+    enabled: true
+  service:
+    type: ClusterIP
+
+ui:
+  enabled: true

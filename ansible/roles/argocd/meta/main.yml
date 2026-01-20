@@ -2,7 +2,7 @@
 
 galaxy_info:
   author: Nuno Fernandes
-  description: Kubernetes cluster health verification
+  description: ArgoCD GitOps continuous delivery tool
   license: MIT
   min_ansible_version: "2.14"
   platforms:
@@ -11,8 +11,8 @@ galaxy_info:
         - all
   galaxy_tags:
     - kubernetes
-    - verification
+    - argocd
+    - gitops
 
 dependencies:
   - role: k3s
-  - role: argocd

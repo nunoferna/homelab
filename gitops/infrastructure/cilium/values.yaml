@@ -1,0 +1,40 @@
+# Cilium for k3s/Raspberry Pi.
+
+# Enable Cilium L2-aware LoadBalancer on the LAN.
+l2announcements:
+  enabled: true
+
+# L2 announcements uses Kubernetes Leases; bump the client rate limit a bit.
+k8sClientRateLimit:
+  qps: 20
+  burst: 40
+
+enableIPv4Masquerade: true
+ipv6:
+  enabled: false
+bpf:
+  masquerade: true
+
+# Enable Gateway API (Cilium Envoy).
+gatewayAPI:
+  enabled: true
+  gatewayClass:
+    create: "true"
+
+# Single-node homelab: keep resource tuning minimal.
+operator:
+  replicas: 1
+
+authentication:
+  mutual:
+    spire:
+      enabled: true
+      install:
+        enabled: true
+
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+  ui:
+    enabled: true

@@ -1,0 +1,20 @@
+---
+
+vault_policies:
+  external-secrets-read:
+    content: |
+      path "secret/data/homelab/*" {
+        capabilities = ["read"]
+      }
+      path "secret/metadata/homelab/*" {
+        capabilities = ["list", "read"]
+      }
+
+  homelab-writer:
+    content: |
+      path "secret/data/homelab/*" {
+        capabilities = ["create", "update", "read"]
+      }
+      path "secret/metadata/homelab/*" {
+        capabilities = ["list", "read"]
+      }

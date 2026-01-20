@@ -26,14 +26,17 @@
     - role: common
       tags: [common, base]
 
-    - role: helm
-      tags: [helm, tools]
+    - role: network
+      tags: [network, static-ip]
 
     - role: k3s
       tags: [k3s, kubernetes]
 
-    - role: cilium
-      tags: [cilium, networking]
+    - role: argocd
+      tags: [argocd, gitops]
+
+    - role: vault
+      tags: [vault, secrets]
 
     - role: k8s_verify
       tags: [verify, validation]

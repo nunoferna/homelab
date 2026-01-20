@@ -1,0 +1,18 @@
+---
+
+vault_namespace: vault
+vault_pod: vault-0
+vault_state_dir: "{{ ansible_env.HOME }}/.homelab/vault"
+vault_init_file: "{{ vault_state_dir }}/vault-init.json"
+vault_unseal_file: "{{ vault_state_dir }}/vault-unseal-key"
+vault_approle_file: "{{ vault_state_dir }}/vault-approle.json"
+vault_wait_timeout: 600
+vault_addr: "http://127.0.0.1:8200"
+
+# Kubernetes auth configuration
+vault_k8s_auth_path: auth/kubernetes
+vault_eso_namespace: external-secrets
+vault_eso_sa: external-secrets
+
+# Policies
+vault_secret_base_path: secret/homelab

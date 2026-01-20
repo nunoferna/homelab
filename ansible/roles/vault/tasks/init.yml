@@ -1,0 +1,84 @@
+---
+- name: Create Vault state directory
+  ansible.builtin.file:
+    path: "{{ vault_state_dir }}"
+    state: directory
+    mode: "0700"
+  tags: init
+
+- name: Check if Vault is initialized
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault status -format=json
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+  register: vault_status_check
+  changed_when: false
+  failed_when: false
+  tags: init
+
+- name: Parse Vault initialization status
+  ansible.builtin.set_fact:
+    vault_initialized: "{{ (vault_status_check.stdout | from_json).initialized }}"
+  when: vault_status_check.rc == 0 or vault_status_check.rc == 2
+  tags: init
+
+- name: Initialize Vault
+  ansible.builtin.command: >
+    kubectl exec {{ vault_pod }} -n {{ vault_namespace }}
+    -- vault operator init -key-shares=1 -key-threshold=1 -format=json
+  environment:
+    KUBECONFIG: "{{ kubeconfig_path }}"
+    VAULT_ADDR: "{{ vault_addr }}"
+  register: vault_init_output
+  changed_when: true
+  when: not vault_initialized | default(false)
+  tags: init
+
+- name: Save Vault initialization output
+  ansible.builtin.copy:
+    content: "{{ vault_init_output.stdout }}"
+    dest: "{{ vault_init_file }}"
+    mode: "0600"
+  when:
+    - vault_init_output is defined
+    - vault_init_output.changed
+  tags: init
+
+- name: Extract unseal key
+  ansible.builtin.shell: >
+    jq -r '.unseal_keys_b64[0]' {{ vault_init_file }}
+  register: vault_unseal_key_output
+  changed_when: false
+  when:
+    - vault_init_output is defined
+    - vault_init_output.changed
+  tags: init
+
+- name: Save unseal key to file
+  ansible.builtin.copy:
+    content: "{{ vault_unseal_key_output.stdout }}"
+    dest: "{{ vault_unseal_file }}"
+    mode: "0600"
+  when:
+    - vault_init_output is defined
+    - vault_init_output.changed
+  tags: init
+
+- name: Display initialization status
+  ansible.builtin.debug:
+    msg:
+      - "✓ Vault initialized"
+      - "Root token and unseal key saved to: {{ vault_state_dir }}"
+      - "⚠ Keep these files secure!"
+  when:
+    - vault_init_output is defined
+    - vault_init_output.changed
+  tags: init
+
+- name: Display already initialized message
+  ansible.builtin.debug:
+    msg: "Vault is already initialized"
+  when: vault_initialized | default(false)
+  tags: init
