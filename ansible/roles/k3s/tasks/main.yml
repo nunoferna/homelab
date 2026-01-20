@@ -36,6 +36,15 @@
   changed_when: false
   tags: k3s
 
+- name: Install Gateway API CRDs
+  ansible.builtin.command: >
+    k3s kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  register: k3s_gateway_api_crds
+  changed_when: "'created' in k3s_gateway_api_crds.stdout or 'configured' in k3s_gateway_api_crds.stdout"
+  tags: [k3s, cilium]
+
 - name: Add Cilium Helm repository
   kubernetes.core.helm_repository:
     name: cilium
@@ -49,16 +58,8 @@
     name: cilium
     chart_ref: cilium/cilium
     release_namespace: kube-system
-    create_namespace: false
-    values:
-      ipam:
-        mode: "kubernetes"
-      k8sServiceHost: "127.0.0.1"
-      k8sServicePort: "6443"
-      kubeProxyReplacement: "true"
-      routingMode: "native"
-      autoDirectNodeRoutes: true
-      ipv4NativeRoutingCIDR: 10.42.0.0/16
+    create_namespace: true
+    values: "{{ lookup('file', role_path ~ '/files/cilium-values.yaml') | from_yaml }}"
   environment:
     KUBECONFIG: "{{ k3s_kubeconfig }}"
   tags: [k3s, cilium]
@@ -66,4 +67,20 @@
 - name: Wait for Cilium to be ready
   ansible.builtin.command: k3s kubectl -n kube-system rollout status ds/cilium --timeout=300s
   changed_when: false
+  tags: [k3s, cilium]
+
+- name: Apply Cilium LoadBalancer IP Pool manifest
+  ansible.builtin.command: "k3s kubectl apply -f {{ role_path }}/files/lbippool.yaml"
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  register: k3s_lbpool_apply
+  changed_when: "'configured' in k3s_lbpool_apply.stdout or 'created' in k3s_lbpool_apply.stdout"
+  tags: [k3s, cilium]
+
+- name: Apply Cilium L2 Announcement Policy manifest
+  ansible.builtin.command: "k3s kubectl apply -f {{ role_path }}/files/l2announcementpolicy.yaml"
+  environment:
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  register: k3s_l2policy_apply
+  changed_when: "'configured' in k3s_l2policy_apply.stdout or 'created' in k3s_l2policy_apply.stdout"
   tags: [k3s, cilium]
