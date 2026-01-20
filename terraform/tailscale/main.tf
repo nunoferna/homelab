@@ -7,6 +7,10 @@ terraform {
       version = ">= 0.25.0"
     }
   }
+
+  backend "local" {
+    path = "/home/nof/terraform-state/vault/terraform.tfstate"
+  }
 }
 
 provider "tailscale" {

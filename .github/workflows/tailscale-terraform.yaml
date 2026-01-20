@@ -32,23 +32,46 @@ jobs:
           terraform_version: 1.14.3
           terraform_wrapper: false
         
-      - name: Terraform fmt
+      - name: Ensure state directory exists
+        run: mkdir -p /home/nof/terraform-state/vault
+      
+      - name: Get Vault root token from cluster
+        id: vault-token
+        run: |
+          TOKEN=$(kubectl get secret vault-root-token -n vault -o jsonpath='{.data.token}' | base64 -d)
+          echo "::add-mask::$TOKEN"
+          echo "vault_token=$TOKEN" >> $GITHUB_OUTPUT
+      
+      - name: Start Vault port forward
+        run: |
+          kubectl port-forward -n vault svc/vault 8200:8200 > /dev/null 2>&1 &
+          echo $! > /tmp/vault-pf.pid
+          sleep 5
+      
+      - name: Terraform Format Check
         id: fmt
-        run: terraform fmt -check
+        run: terraform fmt -check -recursive
         continue-on-error: true
-
+      
       - name: Terraform Init
         id: init
         run: terraform init -input=false
-
+      
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-
+      
       - name: Terraform Plan
         id: plan
-        run: terraform plan -no-color -input=false
-
+        run: terraform plan -no-color -input=false -out=tfplan
+        env:
+          TF_VAR_vault_addr: "http://localhost:8200"
+          TF_VAR_vault_token: ${{ steps.vault-token.outputs.vault_token }}
+      
       - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         id: apply
-        run: terraform apply -auto-approve -no-color
+        run: terraform apply -auto-approve -no-color tfplan
+        env:
+          TF_VAR_vault_addr: "http://localhost:8200"
+          TF_VAR_vault_token: ${{ steps.vault-token.outputs.vault_token }}
