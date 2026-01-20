@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.5.0"
+  required_version = ">= 1.14.0"
 
   required_providers {
     tailscale = {
@@ -9,7 +9,7 @@ terraform {
   }
 
   backend "local" {
-    path = "/home/nof/terraform-state/vault/terraform.tfstate"
+    path = "/home/nof/terraform-state/tailscale/terraform.tfstate"
   }
 }
 

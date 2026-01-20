@@ -28,7 +28,7 @@
     type: ethernet
     ip4: "{{ network_ipv4_address }}/{{ network_ipv4_prefix }}"
     gw4: "{{ network_gateway }}"
-    dns4: "127.0.0.1,{{ network_gateway }}"
+    dns4: "{{ network_dns_servers | join(',') }}"
     ip6: "{{ network_ipv6_address }}/{{ network_ipv6_prefix }}"
     state: present
     autoconnect: true
@@ -47,4 +47,5 @@
       - "IPv4: {{ network_ipv4_address }}/{{ network_ipv4_prefix }}"
       - "IPv6: {{ network_ipv6_address }}/{{ network_ipv6_prefix }}"
       - "Gateway: {{ network_gateway }}"
+      - "DNS Servers: {{ network_dns_servers | join(', ') }}"
   tags: network

@@ -5,3 +5,6 @@ network_ipv4_prefix: 24
 network_ipv6_address: "fd00::253"  # Adjust based on your IPv6 prefix
 network_ipv6_prefix: 64
 network_gateway: 192.168.1.254
+network_dns_servers:
+  - "1.1.1.1"
+  - "1.0.0.1"

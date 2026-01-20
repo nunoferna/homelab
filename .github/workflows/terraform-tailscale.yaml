@@ -1,0 +1,57 @@
+name: Tailscale Terraform (Policy)
+
+concurrency:
+  group: homelab-tailscale-terraform
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "terraform/tailscale/**"
+  workflow_dispatch:
+
+env:
+  TAILSCALE_OAUTH_CLIENT_ID: ${{ secrets.TAILSCALE_OAUTH_CLIENT_ID }}
+  TAILSCALE_OAUTH_CLIENT_SECRET: ${{ secrets.TAILSCALE_OAUTH_CLIENT_SECRET }}
+  TAILSCALE_TAILNET: ${{ secrets.TAILSCALE_TAILNET }}
+
+jobs:
+  terraform:
+    runs-on: self-hosted
+    defaults:
+      run:
+        working-directory: terraform/tailscale
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.14.3
+          terraform_wrapper: false
+
+      - name: Ensure state directory exists
+        run: mkdir -p /home/nof/terraform-state/tailscale
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+        continue-on-error: true
+
+      - name: Terraform Init
+        id: init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false
+
+      - name: Terraform Apply
+        id: apply
+        run: terraform apply -auto-approve -no-color

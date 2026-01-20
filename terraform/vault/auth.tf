@@ -5,8 +5,8 @@ resource "vault_auth_backend" "kubernetes" {
 }
 
 resource "vault_kubernetes_auth_backend_config" "k8s" {
-  backend            = vault_auth_backend.kubernetes.path
-  kubernetes_host    = "https://kubernetes.default.svc:443"
+  backend              = vault_auth_backend.kubernetes.path
+  kubernetes_host      = "https://kubernetes.default.svc:443"
   disable_local_ca_jwt = false
 }
 
@@ -31,7 +31,7 @@ resource "vault_approle_auth_backend_role" "homelab_ci" {
   token_policies = [vault_policy.homelab_writer.name]
   token_ttl      = var.approle_token_ttl
   token_max_ttl  = var.approle_token_max_ttl
-  
+
   secret_id_bound_cidrs = ["0.0.0.0/0"]
   token_bound_cidrs     = ["0.0.0.0/0"]
 }
