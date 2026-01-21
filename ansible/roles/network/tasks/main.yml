@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure NetworkManager is installed
   ansible.builtin.apt:
     name: network-manager
@@ -21,6 +20,26 @@
     network_interface: "{{ network_detected_interface.stdout }}"
   tags: network
 
+- name: Get existing connections on interface
+  ansible.builtin.shell: |
+    set -o pipefail
+    nmcli -t -f NAME,DEVICE connection show | grep ":{{ network_interface }}$" | cut -d: -f1
+  register: network_existing_connections
+  changed_when: false
+  failed_when: false
+  tags: network
+
+- name: Remove existing connections
+  community.general.nmcli:
+    conn_name: "{{ item }}"
+    state: absent
+  loop: "{{ network_existing_connections.stdout_lines }}"
+  when:
+    - network_existing_connections.stdout_lines is defined
+    - item != "static-" ~ network_interface
+  tags: network
+  become: true
+
 - name: Configure static IP with NetworkManager
   community.general.nmcli:
     conn_name: "static-{{ network_interface }}"
@@ -37,8 +56,24 @@
 
 - name: Activate connection
   ansible.builtin.command: nmcli connection up "static-{{ network_interface }}"
-  changed_when: true
+  register: network_nmcli_result
+  changed_when: "'successfully activated' in network_nmcli_result.stdout"
+  failed_when: network_nmcli_result.rc != 0 and 'already active' not in network_nmcli_result.stderr
   tags: network
+  become: true
+
+- name: Wait for network to stabilize
+  ansible.builtin.pause:
+    seconds: 3
+  tags: network
+
+- name: Verify connectivity to gateway
+  ansible.builtin.wait_for:
+    host: "{{ network_gateway }}"
+    port: 22
+    timeout: 10
+  tags: network
+  failed_when: false
 
 - name: Display network configuration
   ansible.builtin.debug:

@@ -10,7 +10,7 @@ spec:
   source:
     repoURL: https://github.com/nunoferna/homelab.git
     targetRevision: main
-    path: gitops/infrastructure/gateway
+    path: gitops/infrastructure/gateway/base
   destination:
     server: https://kubernetes.default.svc
     namespace: gateway-infra

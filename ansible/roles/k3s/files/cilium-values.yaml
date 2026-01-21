@@ -25,6 +25,10 @@ gatewayAPI:
   gatewayClass:
     create: "true"
 
+authentication:
+  spire:
+    enabled: true
+
 # Single-node homelab: keep resource tuning minimal.
 operator:
   replicas: 1
