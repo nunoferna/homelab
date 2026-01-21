@@ -10,3 +10,5 @@ spec:
       kubernetes:
         mountPath: /v1/auth/kubernetes
         role: cert-manager
+        serviceAccountRef:
+          name: cert-manager

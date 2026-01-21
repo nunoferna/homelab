@@ -19,6 +19,16 @@ resource "vault_kubernetes_auth_backend_role" "default" {
   token_policies                   = [vault_policy.homelab_reader.name]
 }
 
+# cert-manager Kubernetes Auth Role
+resource "vault_kubernetes_auth_backend_role" "cert_manager" {
+  backend                          = vault_auth_backend.kubernetes.path
+  role_name                        = "cert-manager"
+  bound_service_account_names      = ["cert-manager"]
+  bound_service_account_namespaces = ["cert-manager"]
+  token_ttl                        = 86400 # 24 hours
+  token_policies                   = [vault_policy.cert_manager.name]
+}
+
 # AppRole Auth
 resource "vault_auth_backend" "approle" {
   type        = "approle"
