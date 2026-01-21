@@ -4,7 +4,9 @@ metadata:
   name: homelab-gateway
   namespace: gateway-infra
   annotations:
-    argocd.argoproj.io/sync-wave: "4"
+    cert-manager.io/cluster-issuer: vault-issuer
+    cert-manager.io/duration: 720h
+    cert-manager.io/renew-before: 72h
 spec:
   gatewayClassName: cilium
   addresses:
@@ -17,3 +19,14 @@ spec:
       allowedRoutes:
         namespaces:
           from: All
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: "*.home.lab"
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: wildcard-home-lab-tls
