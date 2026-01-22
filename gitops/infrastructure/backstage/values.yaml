@@ -34,6 +34,11 @@ backstage:
       baseUrl: https://backstage.home.lab
     backend:
       baseUrl: https://backstage.home.lab
+      image:
+        registry: ghcr.io
+        repository: nunoferna/backstage
+        tag: latest
+        pullPolicy: Always
       database:
         client: pg
         connection:
