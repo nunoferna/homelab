@@ -28,17 +28,18 @@ backstage:
       {{ `{{- end -}}` }}
     vault.hashicorp.com/agent-pre-populate-only: "true"
 
+  image:
+    registry: ghcr.io
+    repository: nunoferna/homelab/backstage
+    tag: main
+    pullPolicy: Always
+
   appConfig:
     app:
       title: "Homelab Portal"
       baseUrl: https://backstage.home.lab
     backend:
       baseUrl: https://backstage.home.lab
-      image:
-        registry: ghcr.io
-        repository: nunoferna/backstage
-        tag: latest
-        pullPolicy: Always
       database:
         client: pg
         connection:

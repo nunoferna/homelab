@@ -7,3 +7,4 @@ spec:
   type: team
   profile:
     displayName: Homelab Administrators
+  children: []
