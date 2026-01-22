@@ -6,8 +6,11 @@ backstage:
   args:
     - -c
     - |
-      source /vault/secrets/database
-      exec node packages/backend
+      . /vault/secrets/database
+      . /vault/secrets/github
+      exec node packages/backend \
+        --config /app/app-config.yaml \
+        --config /app/app-config-from-configmap.yaml
   podAnnotations:
     vault.hashicorp.com/agent-inject: "true"
     vault.hashicorp.com/role: "backstage"
@@ -17,7 +20,47 @@ backstage:
       export POSTGRES_USER="{{ `{{ .Data.username }}` }}"
       export POSTGRES_PASSWORD="{{ `{{ .Data.password }}` }}"
       {{ `{{- end -}}` }}
+    vault.hashicorp.com/agent-inject-secret-github: "secret/data/backstage/github"
+    vault.hashicorp.com/agent-inject-template-github: |
+      {{ `{{- with secret "secret/data/backstage/github" -}}` }}
+      export GITHUB_CLIENT_ID="{{ `{{ .Data.data.client_id }}` }}"
+      export GITHUB_CLIENT_SECRET="{{ `{{ .Data.data.client_secret }}` }}"
+      {{ `{{- end -}}` }}
     vault.hashicorp.com/agent-pre-populate-only: "true"
+
+  appConfig:
+    app:
+      title: "Homelab Portal"
+      baseUrl: https://backstage.home.lab
+    backend:
+      baseUrl: https://backstage.home.lab
+      database:
+        client: pg
+        connection:
+          host: backstage-postgresql
+          port: 5432
+          user: ${POSTGRES_USER}
+          password: ${POSTGRES_PASSWORD}
+          database: backstage
+    auth:
+      environment: production
+      providers:
+        github:
+          production:
+            clientId: ${GITHUB_CLIENT_ID}
+            clientSecret: ${GITHUB_CLIENT_SECRET}
+            signIn:
+              resolvers:
+                - resolver: emailMatchingUserEntityProfileEmail
+
+    catalog:
+      rules:
+        - allow: [User, Group]
+      locations:
+        - type: url
+          target: https://github.com/nunoferna/homelab/blob/main/gitops/infrastructure/backstage/catalog/users.yaml
+        - type: url
+          target: https://github.com/nunoferna/homelab/blob/main/gitops/infrastructure/backstage/catalog/groups.yaml
 
 serviceAccount:
   create: true
@@ -30,17 +73,3 @@ postgresql:
     username: backstage-unused
     password: unused
     database: backstage
-
-appConfig:
-  app:
-    baseUrl: https://backstage.home.lab
-  backend:
-    baseUrl: https://backstage.home.lab
-    database:
-      client: pg
-      connection:
-        host: backstage-postgresql
-        port: 5432
-        user: ${POSTGRES_USER}
-        password: ${POSTGRES_PASSWORD}
-        database: backstage

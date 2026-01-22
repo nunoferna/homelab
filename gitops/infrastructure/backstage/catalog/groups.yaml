@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: admin
+  description: Homelab Administrators
+spec:
+  type: team
+  profile:
+    displayName: Homelab Administrators

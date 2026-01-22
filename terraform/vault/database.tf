@@ -25,7 +25,7 @@ resource "vault_database_secret_backend_role" "backstage" {
   name    = "backstage-role"
   db_name = vault_database_secret_backend_connection.postgres.name
   creation_statements = [
-    "CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';",
+    "CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}' CREATEDB;",
     "GRANT ALL PRIVILEGES ON DATABASE backstage TO \"{{name}}\";",
     "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{{name}}\";",
     "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\";"
