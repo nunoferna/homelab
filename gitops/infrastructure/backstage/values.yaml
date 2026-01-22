@@ -1,0 +1,46 @@
+backstage:
+  revisionHistoryLimit: 0
+
+  command:
+    - sh
+  args:
+    - -c
+    - |
+      source /vault/secrets/database
+      exec node packages/backend
+  podAnnotations:
+    vault.hashicorp.com/agent-inject: "true"
+    vault.hashicorp.com/role: "backstage"
+    vault.hashicorp.com/agent-inject-secret-database: "database/creds/backstage-role"
+    vault.hashicorp.com/agent-inject-template-database: |
+      {{ `{{- with secret "database/creds/backstage-role" -}}` }}
+      export POSTGRES_USER="{{ `{{ .Data.username }}` }}"
+      export POSTGRES_PASSWORD="{{ `{{ .Data.password }}` }}"
+      {{ `{{- end -}}` }}
+    vault.hashicorp.com/agent-pre-populate-only: "true"
+
+serviceAccount:
+  create: true
+  name: backstage
+
+postgresql:
+  enabled: true
+  auth:
+    postgresPassword: rootpassword123
+    username: backstage-unused
+    password: unused
+    database: backstage
+
+appConfig:
+  app:
+    baseUrl: https://backstage.home.lab
+  backend:
+    baseUrl: https://backstage.home.lab
+    database:
+      client: pg
+      connection:
+        host: backstage-postgresql
+        port: 5432
+        user: ${POSTGRES_USER}
+        password: ${POSTGRES_PASSWORD}
+        database: backstage

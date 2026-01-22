@@ -29,6 +29,15 @@ resource "vault_kubernetes_auth_backend_role" "cert_manager" {
   token_policies                   = [vault_policy.cert_manager.name]
 }
 
+resource "vault_kubernetes_auth_backend_role" "backstage" {
+  backend                          = vault_auth_backend.kubernetes.path
+  role_name                        = "backstage"
+  bound_service_account_names      = ["backstage"]
+  bound_service_account_namespaces = ["backstage"]
+  token_ttl                        = 3600
+  token_policies                   = [vault_policy.backstage.name]
+}
+
 # AppRole Auth
 resource "vault_auth_backend" "approle" {
   type        = "approle"
