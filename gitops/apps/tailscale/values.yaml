@@ -1,10 +1,12 @@
 # Tailscale Kubernetes operator values.
 
-installCRDs: true
-
-operatorConfig:
-  # Ensure the operator is scheduled on linux nodes.
-  nodeSelector:
-    kubernetes.io/os: linux
-
-  resources: {}
+podAnnotations:
+  vault.hashicorp.com/agent-inject: "true"
+  vault.hashicorp.com/role: "tailscale"
+  vault.hashicorp.com/agent-inject-secret-operator-oauth: "secret/data/tailscale"
+  vault.hashicorp.com/agent-inject-template-operator-oauth: |
+    {{ `{{- with secret "secret/data/tailscale" -}}` }}
+    client_id: "{{ `{{ .Data.data.client_id }}` }}"
+    client_secret: "{{ `{{ .Data.data.client_secret }}` }}"
+    {{ `{{- end -}}` }}
+  vault.hashicorp.com/agent-pre-populate-only: "true"

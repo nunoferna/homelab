@@ -1,4 +1,15 @@
 # Pi-hole values (homelab defaults).
+
+podAnnotations:
+  vault.hashicorp.com/agent-inject: "true"
+  vault.hashicorp.com/role: "pihole"
+  vault.hashicorp.com/agent-inject-secret-pihole-admin: "secret/data/pihole"
+  vault.hashicorp.com/agent-inject-template-pihole-admin: |
+    {{ `{{- with secret "secret/data/pihole" -}}` }}
+    password: "{{ `{{ .Data.data.password }}` }}"
+    {{ `{{- end -}}` }}
+  vault.hashicorp.com/agent-pre-populate-only: "true"
+
 adlists:
   # HaGeZi Collections
   - https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/gambling.txt
