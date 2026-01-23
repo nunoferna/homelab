@@ -1,6 +1,4 @@
 backstage:
-  revisionHistoryLimit: 0
-
   command:
     - sh
   args:
@@ -25,6 +23,8 @@ backstage:
       {{ `{{- with secret "secret/data/backstage/github" -}}` }}
       export GITHUB_CLIENT_ID="{{ `{{ .Data.data.client_id }}` }}"
       export GITHUB_CLIENT_SECRET="{{ `{{ .Data.data.client_secret }}` }}"
+      export GITHUB_APP_ID="{{ `{{ .Data.data.app_id }}` }}"
+      export GITHUB_PRIVATE_KEY="{{ `{{ .Data.data.private_key }}` }}"
       {{ `{{- end -}}` }}
     vault.hashicorp.com/agent-pre-populate-only: "true"
 
@@ -48,6 +48,11 @@ backstage:
           user: ${POSTGRES_USER}
           password: ${POSTGRES_PASSWORD}
           database: backstage
+      reading:
+        allow:
+          - host: raw.githubusercontent.com
+          - host: github.com
+    signInPage: github
     auth:
       environment: production
       providers:
@@ -57,16 +62,27 @@ backstage:
             clientSecret: ${GITHUB_CLIENT_SECRET}
             signIn:
               resolvers:
-                - resolver: emailMatchingUserEntityProfileEmail
-
+                - resolver: usernameMatchingUserEntityName
+    integrations:
+      github:
+        - host: github.com
+          apps:
+            - appId: "${GITHUB_APP_ID}"
+              clientId: "${GITHUB_CLIENT_ID}"
+              clientSecret: "${GITHUB_CLIENT_SECRET}"
+              privateKey: |
+                ${GITHUB_PRIVATE_KEY}
+              webhookSecret: none
     catalog:
-      rules:
-        - allow: [User, Group]
       locations:
         - type: url
-          target: https://github.com/nunoferna/homelab/blob/main/gitops/infrastructure/backstage/catalog/users.yaml
+          target: https://raw.githubusercontent.com/nunoferna/homelab/refs/heads/main/gitops/infrastructure/backstage/catalog/users.yaml
+          rules:
+            - allow: [User]
         - type: url
-          target: https://github.com/nunoferna/homelab/blob/main/gitops/infrastructure/backstage/catalog/groups.yaml
+          target: https://raw.githubusercontent.com/nunoferna/homelab/refs/heads/main/gitops/infrastructure/backstage/catalog/groups.yaml
+          rules:
+            - allow: [Group]
 
 serviceAccount:
   create: true
