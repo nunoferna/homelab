@@ -8,13 +8,13 @@ resources:
 
   # 2. Core Kubeflow Components (Selected to avoid Cert-Manager conflicts)
   # Notebook Controller
-  - https://github.com/kubeflow/manifests/apps/jupyter/notebook-controller/upstream/overlays/kubeflow?ref=v1.9.0
+  - https://github.com/kubeflow/manifests/applications/jupyter/notebook-controller/upstream/overlays/kubeflow?ref=v1.11.0
   # Profile Controller (Manages Namespaces & Quotas)
-  - https://github.com/kubeflow/manifests/apps/profiles/upstream/overlays/kubeflow?ref=v1.9.0
+  - https://github.com/kubeflow/manifests/applications/profiles/upstream/overlays/kubeflow?ref=v1.11.0
   # Pipelines (KFP) - Multi-user mode
-  - https://github.com/kubeflow/manifests/apps/pipeline/upstream/env/platform-agnostic-multi-user?ref=v1.9.0
+  - https://github.com/kubeflow/manifests/applications/pipeline/upstream/env/platform-agnostic-multi-user?ref=v1.11.0
   # Central Dashboard
-  - https://github.com/kubeflow/manifests/apps/centraldashboard/upstream/overlays/oauth2-proxy?ref=v1.9.0
+  - https://github.com/kubeflow/manifests/applications/centraldashboard/upstream/overlays/oauth2-proxy?ref=v1.11.0
 # 3. Patches
 # If the Dashboard needs to trust your internal CA or Vault certs, add patches here.
 # patches:
