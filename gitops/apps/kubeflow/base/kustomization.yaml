@@ -1,0 +1,29 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  # 1. Your Custom Governance Rules
+  - governance.yaml
+  - httproute.yaml
+
+  # 2. Core Kubeflow Components (Selected to avoid Cert-Manager conflicts)
+  # Notebook Controller
+  - https://github.com/kubeflow/manifests/apps/jupyter/notebook-controller/upstream/overlays/kubeflow?ref=v1.9.0
+  # Profile Controller (Manages Namespaces & Quotas)
+  - https://github.com/kubeflow/manifests/apps/profiles/upstream/overlays/kubeflow?ref=v1.9.0
+  # Pipelines (KFP) - Multi-user mode
+  - https://github.com/kubeflow/manifests/apps/pipeline/upstream/env/platform-agnostic-multi-user?ref=v1.9.0
+  # Central Dashboard
+  - https://github.com/kubeflow/manifests/apps/centraldashboard/upstream/overlays/oauth2-proxy?ref=v1.9.0
+# 3. Patches
+# If the Dashboard needs to trust your internal CA or Vault certs, add patches here.
+# patches:
+#   - target:
+#       kind: Deployment
+#       name: centraldashboard
+#     patch: |-
+#       - op: add
+#         path: /spec/template/spec/containers/0/env/-
+#         value:
+#           name: NODE_TLS_REJECT_UNAUTHORIZED
+#           value: "0"

@@ -1,0 +1,3 @@
+appName: kubeflow
+namespace: kubeflow
+syncWave: "10"
