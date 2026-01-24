@@ -1,0 +1,6 @@
+appName: backstage
+namespace: backstage
+chart: backstage
+repoURL: https://backstage.github.io/charts
+targetRevision: 2.6.3
+syncWave: "2"

@@ -1,0 +1,6 @@
+appName: tailscale
+namespace: tailscale
+chart: tailscale-operator
+repoURL: https://pkgs.tailscale.com/helmcharts
+targetRevision: 1.92.5
+syncWave: "3"
