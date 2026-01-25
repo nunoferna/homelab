@@ -34,3 +34,13 @@ operator:
   replicas: 1
 
 devices: "eth0"
+
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+    frontend:
+      securityContext:
+        readOnlyRootFilesystem: false

@@ -1,0 +1,7 @@
+appName: argocd
+namespace: argocd
+chart: argo-cd
+repoURL: https://argoproj.github.io/argo-helm
+targetRevision: 9.3.5
+syncWave: "-5"
+noBase: true

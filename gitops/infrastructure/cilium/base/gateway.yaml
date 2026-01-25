@@ -4,6 +4,7 @@ metadata:
   name: homelab-gateway
   namespace: gateway-infra
   annotations:
+    argocd.argoproj.io/sync-wave: "2"
     cert-manager.io/cluster-issuer: vault-issuer
     cert-manager.io/duration: 720h
     cert-manager.io/renew-before: 72h

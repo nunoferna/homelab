@@ -1,8 +1,8 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: argocd
-  namespace: argocd
+  name: cilium
+  namespace: kube-system
   annotations:
     argocd.argoproj.io/sync-wave: "5"
 spec:
@@ -10,12 +10,8 @@ spec:
     - name: homelab-gateway
       namespace: gateway-infra
   hostnames:
-    - argo.home.lab
+    - hubble.home.lab
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: argocd-server
+    - backendRefs:
+        - name: hubble-ui
           port: 80
