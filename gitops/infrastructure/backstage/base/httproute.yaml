@@ -3,12 +3,10 @@ kind: HTTPRoute
 metadata:
   name: backstage
   namespace: backstage
-  annotations:
-    argocd.argoproj.io/sync-wave: "5"
 spec:
   parentRefs:
     - name: homelab-gateway
-      namespace: gateway-infra
+      namespace: gateway
   hostnames:
     - backstage.home.lab
   rules:

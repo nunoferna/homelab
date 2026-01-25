@@ -10,7 +10,6 @@
   ansible.builtin.apt:
     upgrade: dist
     state: present
-    autoremove: true
     autoclean: true
   tags: packages
   become: true
@@ -32,3 +31,4 @@
     name: "{{ common_packages }}"
     state: present
   tags: packages
+  become: true

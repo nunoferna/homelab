@@ -1,14 +1,12 @@
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
-  name: cilium
+  name: hubble
   namespace: kube-system
-  annotations:
-    argocd.argoproj.io/sync-wave: "5"
 spec:
   parentRefs:
     - name: homelab-gateway
-      namespace: gateway-infra
+      namespace: gateway
   hostnames:
     - hubble.home.lab
   rules:

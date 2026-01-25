@@ -11,11 +11,3 @@
 - name: Include ArgoCD verification tasks
   ansible.builtin.include_tasks: verify.yml
   tags: [argocd, verify]
-
-- name: Apply ArgoCD HTTPRoute
-  ansible.builtin.command: "k3s kubectl apply -f {{ role_path }}/files/httproute.yaml"
-  environment:
-    KUBECONFIG: "{{ k3s_kubeconfig }}"
-  register: argocd_httproute
-  changed_when: "'configured' in argocd_httproute.stdout or 'created' in argocd_httproute.stdout"
-  tags: [argocd, gateway]

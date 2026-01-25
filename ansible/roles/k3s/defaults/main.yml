@@ -13,5 +13,4 @@ k3s_install_url: https://get.k3s.io
 # Raspberry Pi specific
 k3s_rpi_cmdline_paths:
   - /boot/firmware/cmdline.txt
-  - /boot/cmdline.txt
 k3s_rpi_cgroup_params: "cgroup_memory=1 cgroup_enable=memory"

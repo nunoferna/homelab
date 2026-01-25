@@ -2,7 +2,6 @@
 
 - name: Include Raspberry Pi preparation tasks
   ansible.builtin.include_tasks: rpi.yml
-  when: ansible_facts['lsb']['id'] == "Raspbian" or ansible_facts['board'] is defined
   tags: [k3s, raspberry_pi]
 
 - name: Check if k3s is already installed
@@ -30,11 +29,6 @@
 - name: Include k3s verification tasks
   ansible.builtin.include_tasks: verify.yml
   tags: [k3s, verify]
-
-- name: Wait for k3s to be ready
-  ansible.builtin.command: k3s kubectl wait --for=condition=Ready node --all --timeout=300s
-  changed_when: false
-  tags: k3s
 
 - name: Install Gateway API CRDs
   ansible.builtin.command: >

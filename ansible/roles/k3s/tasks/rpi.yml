@@ -14,7 +14,7 @@
       ansible.builtin.stat:
         path: "{{ item }}"
       register: k3s_cmdline_check
-      loop: "{{ rpi_cmdline_paths }}"
+      loop: "{{ k3s_rpi_cmdline_paths }}"
       tags: raspberry_pi
 
     - name: Set cmdline path
@@ -45,6 +45,7 @@
         - k3s_rpi_cmdline_path is defined
         - k3s_cgroups_enabled.rc != 0
       tags: raspberry_pi
+      become: true
 
     - name: Enable cgroups in cmdline.txt
       ansible.builtin.lineinfile:
@@ -58,6 +59,7 @@
         - k3s_cgroups_enabled.rc != 0
       register: k3s_cgroups_modified
       tags: raspberry_pi
+      become: true
 
     - name: Display reboot requirement message
       ansible.builtin.fail:
@@ -76,3 +78,4 @@
         name: "{{ k3s_required_packages }}"
         state: present
       tags: raspberry_pi
+      become: true

@@ -10,11 +10,7 @@ spec:
   hostnames:
     - kubeflow.home.lab
   rules:
-    - matches:
-        - path:
-            type: PathPrefix
-            value: /
-      backendRefs:
-        - name: istio-ingressgateway
-          namespace: istio-system
-          port: 80
+    backendRefs:
+      - name: istio-ingressgateway
+        namespace: istio-system
+        port: 80

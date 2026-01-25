@@ -1,7 +1,7 @@
 global:
   domain: argocd.home.lab
 
-config:
+configs:
   params:
     server.insecure: true
 
@@ -10,7 +10,6 @@ server:
     enabled: true
     parentRefs:
       - name: homelab-gateway
-        namespace: gateway-infra
-        sectionName: https
+        namespace: gateway
     hostnames:
       - argocd.home.lab

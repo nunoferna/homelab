@@ -1,61 +1,28 @@
 ---
-- name: Create ArgoCD namespace
-  ansible.builtin.command: kubectl create namespace {{ argocd_namespace }}
+- name: Add ArgoCD Helm repository
+  kubernetes.core.helm_repository:
+    name: argo
+    repo_url: https://argoproj.github.io/argo-helm
   environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
-  register: argocd_create_ns
-  changed_when: "'created' in argocd_create_ns.stdout"
-  failed_when:
-    - argocd_create_ns.rc != 0
-    - "'already exists' not in argocd_create_ns.stderr"
-  tags: install
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  tags: [k3s, argocd]
 
-- name: Install ArgoCD
-  ansible.builtin.command: >
-    kubectl apply -n {{ argocd_namespace }} -f {{ argocd_install_url }}
+- name: Install ArgoCD via Helm
+  kubernetes.core.helm:
+    name: argocd
+    chart_ref: argo/argo-cd
+    release_namespace: "{{ argocd_namespace }}"
+    create_namespace: true
+    values_files:
+      - "{{ playbook_dir }}/../../gitops/infrastructure/argocd/values.yaml"
   environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
-  register: argocd_install
-  changed_when: >
-    'created' in argocd_install.stdout or
-    'configured' in argocd_install.stdout
-  tags: install
+    KUBECONFIG: "{{ k3s_kubeconfig }}"
+  tags: [k3s, argocd]
 
-- name: Wait for ArgoCD server deployment to be created
-  ansible.builtin.command: >
-    kubectl get deployment {{ argocd_server_deployment }}
-    -n {{ argocd_namespace }}
-  environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
-  register: argocd_deployment_exists
-  until: argocd_deployment_exists.rc == 0
-  retries: 30
-  delay: 2
+- name: Wait for ArgoCD to be ready
+  ansible.builtin.command: k3s kubectl -n "{{ argocd_namespace }}" rollout status deployment/argocd-server --timeout=300s
   changed_when: false
-  tags: install
-
-- name: Configure ArgoCD server to disable internal TLS
-  ansible.builtin.command: >
-    kubectl patch configmap argocd-cmd-params-cm
-    -n {{ argocd_namespace }}
-    --type merge
-    -p '{"data":{"server.insecure":"true"}}'
-  environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
-  register: argocd_patch_cm
-  changed_when: "'patched' in argocd_patch_cm.stdout or 'configured' in argocd_patch_cm.stdout"
-  when: argocd_server_insecure
-  tags: install
-
-- name: Wait for ArgoCD server deployment
-  ansible.builtin.command: >
-    kubectl wait --for=condition=available
-    deployment/{{ argocd_server_deployment }}
-    -n {{ argocd_namespace }} --timeout={{ argocd_wait_timeout }}
-  environment:
-    KUBECONFIG: "{{ kubeconfig_path }}"
-  changed_when: false
-  tags: install
+  tags: [k3s, argocd]
 
 - name: Display ArgoCD installation status
   ansible.builtin.debug:
