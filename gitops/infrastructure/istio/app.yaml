@@ -1,0 +1,7 @@
+appName: istio-base
+namespace: istio-system
+syncWave: "-5"
+chart: base
+repoURL: https://istio-release.storage.googleapis.com/charts
+targetRevision: 1.28.3
+noBase: true
