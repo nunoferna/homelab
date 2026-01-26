@@ -14,7 +14,7 @@ resources:
   # Pipelines (KFP) - Multi-user mode
   - https://github.com/kubeflow/manifests/applications/pipeline/upstream/env/platform-agnostic-multi-user?ref=v1.11.0
   # Central Dashboard
-  - https://github.com/kubeflow/manifests/applications/centraldashboard/upstream/overlays/oauth2-proxy?ref=v1.11.0
+  - https://github.com/kubeflow/manifests/applications/centraldashboard/overlays/oauth2-proxy?ref=v1.11.0
 # 3. Patches
 # If the Dashboard needs to trust your internal CA or Vault certs, add patches here.
 # patches:
