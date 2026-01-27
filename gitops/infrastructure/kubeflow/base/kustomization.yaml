@@ -2,17 +2,43 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  # 1. Your Custom Governance Rules
-  - governance.yaml
+  # === 1. ISTIO STACK (The Foundation) ===
+  # Installs Custom Resource Definitions (VirtualService, Gateway, etc.)
+  - https://github.com/kubeflow/manifests/common/istio/istio-crds/base?ref=v1.11.0
+  
+  # Creates 'istio-system' namespace
+  - https://github.com/kubeflow/manifests/common/istio/istio-namespace/base?ref=v1.11.0
+  
+  # Installs Istiod (Control Plane) and Ingress Gateway
+  # Using 'oauth2-proxy' overlay is standard for Kubeflow, even if you disable auth later.
+  - https://github.com/kubeflow/manifests/common/istio/istio-install/overlays/oauth2-proxy?ref=v1.11.0
 
-  # 2. Core Kubeflow Components (Selected to avoid Cert-Manager conflicts)
-  # Notebook Controller
-  - https://github.com/kubeflow/manifests/applications/jupyter/notebook-controller/upstream/overlays/kubeflow?ref=v1.11.0
-  # Profile Controller (Manages Namespaces & Quotas)
-  - https://github.com/kubeflow/manifests/applications/profiles/upstream/overlays/kubeflow?ref=v1.11.0
-  # Pipelines (KFP) - Multi-user mode
-  # - https://github.com/kubeflow/manifests/applications/pipeline/upstream/env/platform-agnostic-multi-user?ref=v1.11.0
+  # === 2. KUBEFLOW CORE NETWORKING ===
+  # Creates 'kubeflow' namespace
+  - https://github.com/kubeflow/manifests/common/kubeflow-namespace/base?ref=v1.11.0
+
+  # Roles and RBAC (Admin, Edit, View)
+  - https://github.com/kubeflow/manifests/common/kubeflow-roles/base?ref=v1.11.0
+
+  # The "Glue": Creates the 'kubeflow-gateway', AuthorizationPolicies, etc.
+  - https://github.com/kubeflow/manifests/common/istio/kubeflow-istio-resources/base?ref=v1.11.0
+
+  # === 3. APPLICATIONS (ARM64 Compatible) ===
   # Central Dashboard
   - https://github.com/kubeflow/manifests/applications/centraldashboard/overlays/oauth2-proxy?ref=v1.11.0
-# 3. Patches
 
+  # Notebook Controller
+  - https://github.com/kubeflow/manifests/applications/jupyter/notebook-controller/upstream/overlays/kubeflow?ref=v1.11.0
+
+  # Profile Controller
+  - https://github.com/kubeflow/manifests/applications/profiles/upstream/overlays/kubeflow?ref=v1.11.0
+
+  # Jupyter Web App (UI for launching notebooks)
+  - https://github.com/kubeflow/manifests/applications/jupyter/jupyter-web-app/upstream/overlays/istio?ref=v1.11.0
+
+  # Admission Webhook (Required for defaults)
+  - https://github.com/kubeflow/manifests/applications/admission-webhook/upstream/overlays/cert-manager?ref=v1.11.0
+
+  # === 4. CUSTOM PATCHES/FIXES ===
+  # (Include your SeaweedFS shim or other fixes here if still needed)
+  # - seaweed-shim.yaml

@@ -44,3 +44,6 @@ hubble:
     frontend:
       securityContext:
         readOnlyRootFilesystem: false
+
+cni:
+  exclusive: false
