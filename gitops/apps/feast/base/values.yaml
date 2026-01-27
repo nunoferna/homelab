@@ -1,0 +1,45 @@
+# === Global Configuration ===
+# This string is passed to both the UI and the Server
+feature_store_yaml_base64: "cHJvamVjdDogaG9tZWxhYl9mZWFzdApyZWdpc3RyeToKICByZWdpc3RyeV9zdG9yZV90eXBlOiBzMwogIHBhdGg6IHMzOi8vZmVhc3QtcmVnaXN0cnkvcmVnaXN0cnkuZGIKICBzM19lbmRwb2ludF91cmw6ICJodHRwOi8vc2Vhd2VlZGZzLXNlcnZpY2Uua3ViZWZsb3cuc3ZjOjgzMzMiICMgSW50ZXJuYWwgU2Vhd2VlZEZTCnByb3ZpZGVyOiBsb2NhbApvbmxpbmVfc3RvcmU6CiAgdHlwZTogcmVkaXMKICBjb25uZWN0aW9uX3N0cmluZzogInJlZGlzLW1hc3Rlci5mZWFzdC5zdmM6NjM3OSIKb2ZmbGluZV9zdG9yZToKICB0eXBlOiBmaWxlCg==%"
+
+# === 1. Feature Server (Online) ===
+feast-online:
+  feast_mode: online
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 80
+  # Connect to Redis and S3
+  extraEnvs:
+    - name: AWS_ACCESS_KEY_ID
+      value: "YOUR_SEAWEEDFS_USER" # or use a SecretKeyRef
+    - name: AWS_SECRET_ACCESS_KEY
+      value: "YOUR_SEAWEEDFS_PASSWORD"
+    - name: AWS_REGION
+      value: "us-east-1" # Required by boto3 even if using local S3
+
+# === 2. Feast UI ===
+feast-ui:
+  feast_mode: ui
+  replicaCount: 1
+  service:
+    type: ClusterIP
+    port: 80
+  # The UI also needs access to the Registry (S3)
+  extraEnvs:
+    - name: AWS_ACCESS_KEY_ID
+      value: "YOUR_SEAWEEDFS_USER"
+    - name: AWS_SECRET_ACCESS_KEY
+      value: "YOUR_SEAWEEDFS_PASSWORD"
+    - name: AWS_REGION
+      value: "us-east-1"
+
+# === 3. Redis (Online Store) ===
+redis:
+  enabled: true
+  architecture: standalone
+  auth:
+    enabled: false # Disabled for simple homelab usage
+  master:
+    persistence:
+      enabled: false # Keep it in-memory for speed/simplicity

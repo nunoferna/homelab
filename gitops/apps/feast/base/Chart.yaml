@@ -1,0 +1,21 @@
+apiVersion: v2
+name: feast-umbrella
+version: 1.0.0
+dependencies:
+  # 1. Feast Feature Server (Online Serving)
+  - name: feast-feature-server
+    version: 0.59.0
+    repository: https://feast-helm-charts.storage.googleapis.com
+    alias: feast-online
+
+  # 2. Feast UI (Web Dashboard)
+  - name: feast-feature-server
+    version: 0.59.0
+    repository: https://feast-helm-charts.storage.googleapis.com
+    alias: feast-ui
+
+  # 3. Redis (The Online Store)
+  - name: redis
+    version: 24.1.2
+    repository: oci://registry-1.docker.io/bitnamicharts
+    condition: redis.enabled
