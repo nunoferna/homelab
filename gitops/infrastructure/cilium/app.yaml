@@ -1,6 +1,5 @@
 appName: cilium
 namespace: kube-system
-repoURL: https://helm.cilium.io/
-chart: cilium
+repoURL: oci://quay.io/cilium/charts/cilium
 targetRevision: 1.18.6
 syncWave: "-10"

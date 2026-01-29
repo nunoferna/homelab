@@ -1,16 +1,9 @@
 ---
-- name: Add ArgoCD Helm repository
-  kubernetes.core.helm_repository:
-    name: argo
-    repo_url: https://argoproj.github.io/argo-helm
-  environment:
-    KUBECONFIG: "{{ k3s_kubeconfig }}"
-  tags: [k3s, argocd]
-
-- name: Install ArgoCD via Helm
+- name: Install ArgoCD via Helm (via OCI)
   kubernetes.core.helm:
     name: argocd
-    chart_ref: argo/argo-cd
+    chart_ref: oci://ghcr.io/argoproj/argo-helm/argo-cd
+    chart_version: 9.3.7
     release_namespace: "{{ argocd_namespace }}"
     create_namespace: true
     values_files:

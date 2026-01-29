@@ -5,32 +5,32 @@ sortOptions:
   order: legacy
   legacySortOptions:
     orderFirst:
-    - Namespace
-    - ResourceQuota
-    - StorageClass
-    - CustomResourceDefinition
-    - MutatingWebhookConfiguration
-    - ServiceAccount
-    - PodSecurityPolicy
-    - NetworkPolicy
-    - Role
-    - ClusterRole
-    - RoleBinding
-    - ClusterRoleBinding
-    - ConfigMap
-    - Secret
-    - Endpoints
-    - Service
-    - LimitRange
-    - PriorityClass
-    - PersistentVolume
-    - PersistentVolumeClaim
-    - Deployment
-    - StatefulSet
-    - CronJob
-    - PodDisruptionBudget
+      - Namespace
+      - ResourceQuota
+      - StorageClass
+      - CustomResourceDefinition
+      - MutatingWebhookConfiguration
+      - ServiceAccount
+      - PodSecurityPolicy
+      - NetworkPolicy
+      - Role
+      - ClusterRole
+      - RoleBinding
+      - ClusterRoleBinding
+      - ConfigMap
+      - Secret
+      - Endpoints
+      - Service
+      - LimitRange
+      - PriorityClass
+      - PersistentVolume
+      - PersistentVolumeClaim
+      - Deployment
+      - StatefulSet
+      - CronJob
+      - PodDisruptionBudget
     orderLast:
-    - ValidatingWebhookConfiguration
+      - ValidatingWebhookConfiguration
 
 resources:
   - httproute.yaml

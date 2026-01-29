@@ -1,12 +1,11 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: homelab-helm-apps
+  name: homelab-apps-plain
   namespace: argocd
 spec:
   goTemplate: true
-  goTemplateOptions:
-    - "missingkey=error"
+  goTemplateOptions: ["missingkey=error"]
   generators:
     - git:
         repoURL: https://github.com/nunoferna/homelab.git
@@ -16,117 +15,14 @@ spec:
         pathParamPrefix: src
       selector:
         matchExpressions:
-          - key: chart
-            operator: Exists
-          - key: noBase
-            operator: DoesNotExist
+          - { key: chart, operator: DoesNotExist }
+          - { key: repoURL, operator: DoesNotExist }
   template:
     metadata:
       name: "{{.appName}}"
       namespace: argocd
       annotations:
-        argocd.argoproj.io/sync-wave: "{{.syncWave}}"
-    spec:
-      project: '{{ index (splitList "/" .src.path.path) 1 }}'
-      sources:
-        - repoURL: "{{.repoURL}}"
-          chart: "{{.chart}}"
-          targetRevision: "{{.targetRevision}}"
-          helm:
-            valueFiles:
-              - "$values/{{.src.path.path}}/values.yaml"
-        - repoURL: https://github.com/nunoferna/homelab.git
-          targetRevision: main
-          ref: values
-        - repoURL: https://github.com/nunoferna/homelab.git
-          targetRevision: main
-          path: "{{.src.path.path}}/base"
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: "{{.namespace}}"
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-        syncOptions:
-          - CreateNamespace=true
----
-apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
-metadata:
-  name: homelab-helm-apps-no-base
-  namespace: argocd
-spec:
-  goTemplate: true
-  goTemplateOptions:
-    - "missingkey=error"
-  generators:
-    - git:
-        repoURL: https://github.com/nunoferna/homelab.git
-        revision: main
-        files:
-          - path: "gitops/**/app.yaml"
-        pathParamPrefix: src
-      selector:
-        matchExpressions:
-          - key: chart
-            operator: Exists
-          - key: noBase
-            operator: Exists
-  template:
-    metadata:
-      name: "{{.appName}}"
-      namespace: argocd
-      annotations:
-        argocd.argoproj.io/sync-wave: "{{.syncWave}}"
-    spec:
-      project: '{{ index (splitList "/" .src.path.path) 1 }}'
-      sources:
-        - repoURL: "{{.repoURL}}"
-          chart: "{{.chart}}"
-          targetRevision: "{{.targetRevision}}"
-          helm:
-            valueFiles:
-              - "$values/{{.src.path.path}}/values.yaml"
-        - repoURL: https://github.com/nunoferna/homelab.git
-          targetRevision: main
-          ref: values
-      destination:
-        server: https://kubernetes.default.svc
-        namespace: "{{.namespace}}"
-      syncPolicy:
-        automated:
-          prune: true
-          selfHeal: true
-        syncOptions:
-          - CreateNamespace=true
----
-apiVersion: argoproj.io/v1alpha1
-kind: ApplicationSet
-metadata:
-  name: homelab-plain-apps
-  namespace: argocd
-spec:
-  goTemplate: true
-  goTemplateOptions:
-    - "missingkey=error"
-  generators:
-    - git:
-        repoURL: https://github.com/nunoferna/homelab.git
-        revision: main
-        files:
-          - path: "gitops/**/app.yaml"
-        pathParamPrefix: src
-      selector:
-        matchExpressions:
-          - key: chart
-            operator: DoesNotExist
-  template:
-    metadata:
-      name: "{{.appName}}"
-      namespace: argocd
-      annotations:
-        argocd.argoproj.io/sync-wave: "{{.syncWave}}"
+        argocd.argoproj.io/sync-wave: '{{ default "0" .syncWave }}'
     spec:
       project: '{{ index (splitList "/" .src.path.path) 1 }}'
       source:

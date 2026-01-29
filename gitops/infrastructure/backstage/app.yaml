@@ -1,6 +1,5 @@
 appName: backstage
 namespace: backstage
-chart: backstage
-repoURL: https://backstage.github.io/charts
+repoURL: oci://ghcr.io/backstage/charts/backstage
 targetRevision: 2.6.3
 syncWave: "2"
