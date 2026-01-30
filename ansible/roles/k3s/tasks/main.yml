@@ -1,5 +1,4 @@
 ---
-
 - name: Include Raspberry Pi preparation tasks
   ansible.builtin.include_tasks: rpi.yml
   tags: [k3s, raspberry_pi]

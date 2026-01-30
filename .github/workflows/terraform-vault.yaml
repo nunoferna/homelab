@@ -1,14 +1,11 @@
 name: Vault Terraform (Policy)
 
 concurrency:
-  group: homelab-vault-terraform
+  group: vault-terraform
   cancel-in-progress: true
 
 on:
-  push:
-    branches: ["main"]
-    paths:
-      - "terraform/vault/**"
+  workflow_call:
   workflow_dispatch:
 
 jobs:
@@ -28,7 +25,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Ensure state directory exists
-        run: mkdir -p /home/nof/terraform-state/vault
+        run: mkdir -p /home/nof/.terraform/vault
 
       - name: Get Vault root token from cluster
         id: vault-token

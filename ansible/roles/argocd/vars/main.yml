@@ -1,4 +1,0 @@
----
-
-argocd_server_service: argocd-server
-argocd_server_deployment: argocd-server

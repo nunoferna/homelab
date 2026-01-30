@@ -9,7 +9,7 @@
   ansible.builtin.get_url:
     url: "{{ k3s_install_url }}"
     dest: "/tmp/k3s_install.sh"
-    mode: '0755'
+    mode: "0755"
   when: not k3s_exists.stat.exists
   register: k3s_script_downloaded
   tags: install

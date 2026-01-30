@@ -1,0 +1,52 @@
+name: CI Orchestrator
+
+concurrency:
+  group: ci-orchestrator-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  # Job 1: Check which files have changed
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      bootstrap: ${{ steps.filter.outputs.bootstrap }}
+      tailscale: ${{ steps.filter.outputs.tailscale }}
+      vault: ${{ steps.filter.outputs.vault }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            bootstrap:
+              - 'ansible/**'
+            tailscale:
+              - 'terraform/tailscale/**'
+            vault:
+              - 'terraform/vault/**'
+
+  # Job 2: Run Bootstrap (Only if ansible files changed)
+  run-bootstrap:
+    needs: changes
+    if: ${{ needs.changes.outputs.bootstrap == 'true' }}
+    uses: ./.github/workflows/bootstrap.yaml
+    secrets: inherit
+
+  # Job 3: Run Tailscale Terraform
+  run-tailscale:
+    needs: [changes, run-bootstrap]
+    if: ${{ always() && needs.changes.outputs.tailscale == 'true' && (needs.run-bootstrap.result == 'success' || needs.run-bootstrap.result == 'skipped') }}
+    uses: ./.github/workflows/terraform-tailscale.yaml
+    secrets: inherit
+
+  # Job 4: Run Vault Terraform
+  run-vault:
+    needs: [changes, run-bootstrap]
+    if: ${{ always() && needs.changes.outputs.vault == 'true' && (needs.run-bootstrap.result == 'success' || needs.run-bootstrap.result == 'skipped') }}
+    uses: ./.github/workflows/terraform-vault.yaml
+    secrets: inherit

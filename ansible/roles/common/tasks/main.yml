@@ -1,5 +1,4 @@
 ---
-
 - name: Include package installation tasks
   ansible.builtin.include_tasks: packages.yml
   tags: [packages, common]

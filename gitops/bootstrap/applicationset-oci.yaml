@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: homelab-apps-oci
+  name: oci-apps
   namespace: argocd
 spec:
   goTemplate: true
@@ -53,7 +53,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: homelab-apps-oci-nobase
+  name: oci-apps-nobase
   namespace: argocd
 spec:
   goTemplate: true

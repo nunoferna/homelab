@@ -1,5 +1,4 @@
 ---
-
 - name: Include ArgoCD installation tasks
   ansible.builtin.include_tasks: install.yml
   tags: [argocd, install]

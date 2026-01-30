@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: homelab-apps-helm-classic
+  name: helm-apps
   namespace: argocd
 spec:
   goTemplate: true
@@ -51,7 +51,7 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: homelab-apps-helm-classic-nobase
+  name: helm-apps-nobase
   namespace: argocd
 spec:
   goTemplate: true

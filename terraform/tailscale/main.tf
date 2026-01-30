@@ -9,7 +9,7 @@ terraform {
   }
 
   backend "local" {
-    path = "/home/nof/terraform-state/tailscale/terraform.tfstate"
+    path = "/home/nof/.terraform/tailscale/terraform.tfstate"
   }
 }
 

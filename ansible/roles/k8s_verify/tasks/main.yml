@@ -1,5 +1,4 @@
 ---
-
 - name: Wait for all nodes to be ready
   ansible.builtin.command: >
     kubectl wait --for=condition=Ready node --all --timeout={{ k8s_verify_node_ready_timeout }}

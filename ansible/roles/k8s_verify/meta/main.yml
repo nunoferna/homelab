@@ -1,5 +1,4 @@
 ---
-
 galaxy_info:
   author: Nuno Fernandes
   description: Kubernetes cluster health verification

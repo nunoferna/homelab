@@ -1,5 +1,4 @@
 ---
-
 - name: Restart k3s service
   ansible.builtin.systemd:
     name: "{{ k3s_service_name }}"

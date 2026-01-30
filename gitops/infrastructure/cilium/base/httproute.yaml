@@ -5,7 +5,7 @@ metadata:
   namespace: kube-system
 spec:
   parentRefs:
-    - name: homelab-gateway
+    - name: gateway
       namespace: gateway
   hostnames:
     - hubble.home.lab

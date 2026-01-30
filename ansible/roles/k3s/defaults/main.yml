@@ -1,5 +1,4 @@
 ---
-
 k3s_binary_path: /usr/local/bin/k3s
 k3s_service_name: k3s
 k3s_kubeconfig: "{{ kubeconfig_path }}"

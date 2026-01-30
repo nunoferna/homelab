@@ -1,14 +1,11 @@
 name: Tailscale Terraform (Policy)
 
 concurrency:
-  group: homelab-tailscale-terraform
+  group: tailscale-terraform
   cancel-in-progress: true
 
 on:
-  push:
-    branches: ["main"]
-    paths:
-      - "terraform/tailscale/**"
+  workflow_call:
   workflow_dispatch:
 
 env:
@@ -33,7 +30,7 @@ jobs:
           terraform_wrapper: false
 
       - name: Ensure state directory exists
-        run: mkdir -p /home/nof/terraform-state/tailscale
+        run: mkdir -p /home/nof/.terraform/tailscale
 
       - name: Terraform fmt
         id: fmt

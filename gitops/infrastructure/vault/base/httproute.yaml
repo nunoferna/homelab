@@ -5,7 +5,7 @@ metadata:
   namespace: vault
 spec:
   parentRefs:
-    - name: homelab-gateway
+    - name: gateway
       namespace: gateway
   hostnames:
     - vault.home.lab

@@ -1,5 +1,4 @@
 ---
-
 galaxy_info:
   author: Nuno Fernandes
   description: ArgoCD GitOps continuous delivery tool

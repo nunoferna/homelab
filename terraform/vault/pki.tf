@@ -11,14 +11,14 @@ resource "vault_mount" "pki" {
 resource "vault_pki_secret_backend_root_cert" "root" {
   backend              = vault_mount.pki.path
   type                 = "internal"
-  common_name          = "Homelab Root CA"
+  common_name          = "Root CA"
   ttl                  = "315360000" # 10 years
   format               = "pem"
   private_key_format   = "der"
   key_type             = "rsa"
   key_bits             = 4096
   exclude_cn_from_sans = true
-  ou                   = "Homelab"
+  ou                   = "Infrastructure"
   organization         = "Homelab"
   issuer_name          = "root-ca"
 }
@@ -31,9 +31,9 @@ resource "vault_pki_secret_backend_config_urls" "config_urls" {
 }
 
 # Create PKI Role for *.home.lab
-resource "vault_pki_secret_backend_role" "homelab" {
+resource "vault_pki_secret_backend_role" "domain" {
   backend               = vault_mount.pki.path
-  name                  = "homelab-dot-home-dot-lab"
+  name                  = "domain"
   ttl                   = 7776000 # 90 days
   max_ttl               = 7776000 # 90 days
   allow_ip_sans         = true

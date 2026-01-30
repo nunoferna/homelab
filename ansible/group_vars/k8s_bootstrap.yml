@@ -1,7 +1,0 @@
----
-# K8s bootstrap specific variables
-k3s_binary_path: /usr/local/bin/k3s
-k3s_service_name: k3s
-
-# Directories
-k3s_config_dir: /etc/rancher/k3s

@@ -1,5 +1,4 @@
 ---
-
 - name: Bootstrap Kubernetes
   hosts: k8s_bootstrap
   gather_facts: true

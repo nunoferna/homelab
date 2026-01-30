@@ -1,14 +1,11 @@
-name: Layer 1 - Host Bootstrap
+name: Host Bootstrap
 
 concurrency:
-  group: homelab-layer1
+  group: bootstrap
   cancel-in-progress: true
 
 on:
-  push:
-    branches: ["main"]
-    paths:
-      - "ansible/**"
+  workflow_call:
   workflow_dispatch:
 
 jobs:

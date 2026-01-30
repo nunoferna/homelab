@@ -1,9 +1,7 @@
 ---
-
 galaxy_info:
   author: Nuno Fernandes
   description: K3s lightweight Kubernetes distribution
-  company: NOF Homelab
   license: MIT
   min_ansible_version: "2.14"
   platforms:

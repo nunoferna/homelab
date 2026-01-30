@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
-  name: homelab-apps-plain
+  name: plain-apps
   namespace: argocd
 spec:
   goTemplate: true

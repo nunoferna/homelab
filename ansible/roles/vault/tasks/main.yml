@@ -1,5 +1,4 @@
 ---
-
 - name: Wait for Vault pod to be running
   ansible.builtin.command: >
     kubectl get pod {{ vault_pod }} -n {{ vault_namespace }}

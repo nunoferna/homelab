@@ -11,7 +11,7 @@
 
 - name: Get ArgoCD server service
   ansible.builtin.command: >
-    kubectl get svc {{ argocd_server_service }}
+    kubectl get svc argocd-server
     -n {{ argocd_namespace }} -o jsonpath='{.spec.clusterIP}'
   environment:
     KUBECONFIG: "{{ kubeconfig_path }}"

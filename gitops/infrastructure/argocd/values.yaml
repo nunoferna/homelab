@@ -9,7 +9,7 @@ server:
   httproute:
     enabled: true
     parentRefs:
-      - name: homelab-gateway
+      - name: gateway
         namespace: gateway
     hostnames:
       - argocd.home.lab

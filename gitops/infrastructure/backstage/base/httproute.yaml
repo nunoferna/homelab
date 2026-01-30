@@ -5,7 +5,7 @@ metadata:
   namespace: backstage
 spec:
   parentRefs:
-    - name: homelab-gateway
+    - name: gateway
       namespace: gateway
   hostnames:
     - backstage.home.lab

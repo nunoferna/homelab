@@ -1,5 +1,4 @@
 ---
-
 - name: Ensure .kube directory exists
   ansible.builtin.file:
     path: "{{ ansible_env.HOME }}/.kube"

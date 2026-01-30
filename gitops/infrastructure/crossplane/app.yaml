@@ -1,7 +1,0 @@
-appName: crossplane
-namespace: crossplane-system
-syncWave: "1"
-chart: crossplane
-repoURL: https://charts.crossplane.io/stable
-targetRevision: 2.1.3
-noBase: true

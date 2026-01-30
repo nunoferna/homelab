@@ -1,9 +1,9 @@
 # Allow cert-manager to sign and issue certificates
-path "pki/sign/homelab-dot-home-dot-lab" {
+path "pki/sign/domain" {
   capabilities = ["create", "update"]
 }
 
-path "pki/issue/homelab-dot-home-dot-lab" {
+path "pki/issue/domain" {
   capabilities = ["create"]
 }
 
