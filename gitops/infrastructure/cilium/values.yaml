@@ -24,25 +24,61 @@ gatewayAPI:
   enabled: true
   gatewayClass:
     create: "true"
+envoy:
+  prometheus:
+    serviceMonitor:
+      enabled: true
 
 authentication:
-  spire:
-    enabled: true
+  enabled: true
+  mutual:
+    spire:
+      enabled: false # We are not using SPIRE for now, a PR is fixing it https://github.com/cilium/cilium/issues/40533.
 
 operator:
   replicas: 1
+  prometheus:
+    metricsService: true
+    serviceMonitor:
+      enabled: true
+  dashboards:
+    enabled: true
 
 devices: "eth0"
 
+prometheus:
+  metricsService: true
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+dashboards:
+  enabled: true
+
 hubble:
   enabled: true
+  metrics:
+    enabled:
+      - dns
+      - drop
+      - tcp
+      - flow
+      - port-distribution
+      - icmp
+      - httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction
+    enableOpenMetrics: true
+    serviceMonitor:
+      enabled: true
+    dashboards:
+      enabled: true
   relay:
     enabled: true
+    prometheus:
+      enabled: true
+      serviceMonitor:
+        enabled: true
   ui:
     enabled: true
     frontend:
       securityContext:
         readOnlyRootFilesystem: false
-
-cni:
-  exclusive: false

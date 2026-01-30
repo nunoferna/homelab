@@ -3,3 +3,4 @@ namespace: kube-system
 repoURL: oci://quay.io/cilium/charts/cilium
 targetRevision: 1.18.6
 syncWave: "-10"
+serverSideApply: true

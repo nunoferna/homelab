@@ -1,0 +1,6 @@
+appName: kube-prometheus-stack
+namespace: monitoring
+repoURL: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+targetRevision: 81.2.0
+syncWave: "10"
+serverSideApply: true

@@ -1,0 +1,54 @@
+# Disable components that K3s manages internally to avoid conflicts
+kubeEtcd:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeScheduler:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubelet:
+  jobNameOverride: "k3s-server"
+
+prometheusOperator:
+  admissionWebhooks:
+    enabled: false
+    patch:
+      enabled: false
+  # Also disable the TLS proxy if it's causing issues
+  tls:
+    enabled: false
+
+prometheus:
+  prometheusSpec:
+    # This is critical: Tell Prometheus to look for ServiceMonitors globally (or in specific namespaces)
+    serviceMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelector: {}
+    serviceMonitorNamespaceSelector: {}
+
+    # Storage settings
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          resources:
+            requests:
+              storage: 20Gi
+    retention: 10d
+
+grafana:
+  enabled: true
+  adminPassword: "admin" # TODO: Inject via Vault later
+  persistence:
+    enabled: true
+    size: 10Gi
+  grafana.ini:
+    server:
+      root_url: "https://grafana.home.lab"
+
+# We use Gateway API, so disable the default Ingress
+ingress:
+  enabled: false
+
+nodeExporter:
+  enabled: true
