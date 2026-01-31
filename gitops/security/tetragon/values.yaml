@@ -1,0 +1,23 @@
+tetragon:
+  # -----------------------------------------------------------------------
+  # TODO: RE-ENABLE AFTER MIGRATION TO TALOS LINUX
+  # The Tetragon agent requires a kernel with BTF support.
+  # We disable the agent DaemonSet now to prevent crash loops on Raspberry Pi OS.
+  # -----------------------------------------------------------------------
+  enabled: false
+  enableProcessCred: true # Was true: Shows UID/GID of process
+  enableProcessNs: true # Was true: Shows Namespace of process
+
+  prometheus:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+
+  export:
+    mode: stdout
+    filenames: ["tetragon.log"]
+
+tetragonOperator:
+  prometheus:
+    serviceMonitor:
+      enabled: true
