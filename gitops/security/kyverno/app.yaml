@@ -1,0 +1,6 @@
+appName: kyverno
+namespace: kyverno
+repoURL: oci://ghcr.io/kyverno/charts/kyverno
+targetRevision: 3.6.2
+syncWave: "-1"
+serverSideApply: true
