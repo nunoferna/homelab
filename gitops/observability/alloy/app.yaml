@@ -1,0 +1,7 @@
+appName: alloy
+namespace: monitoring
+chart: alloy
+repoURL: https://grafana.github.io/helm-charts
+targetRevision: 1.5.3
+syncWave: "10"
+serverSideApply: true
