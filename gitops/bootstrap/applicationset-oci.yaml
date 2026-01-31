@@ -38,6 +38,8 @@ spec:
         - repoURL: https://github.com/nunoferna/homelab.git
           targetRevision: main
           path: "{{.src.path.path}}/base"
+          directory:
+            recurse: true
       destination:
         server: https://kubernetes.default.svc
         namespace: "{{.namespace}}"
