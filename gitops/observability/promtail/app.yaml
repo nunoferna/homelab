@@ -1,0 +1,7 @@
+appName: promtail
+namespace: monitoring
+repoURL: oci://ghcr.io/grafana/helm-charts/promtail
+targetRevision: 6.17.1
+syncWave: "10"
+serverSideApply: true
+noBase: true

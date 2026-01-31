@@ -15,18 +15,12 @@ prometheusOperator:
     enabled: false
     patch:
       enabled: false
-  # Also disable the TLS proxy if it's causing issues
   tls:
     enabled: false
 
 prometheus:
   prometheusSpec:
-    # This is critical: Tell Prometheus to look for ServiceMonitors globally (or in specific namespaces)
     serviceMonitorSelectorNilUsesHelmValues: false
-    serviceMonitorSelector: {}
-    serviceMonitorNamespaceSelector: {}
-
-    # Storage settings
     storageSpec:
       volumeClaimTemplate:
         spec:

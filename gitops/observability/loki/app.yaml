@@ -1,0 +1,6 @@
+appName: loki
+namespace: monitoring
+repoURL: oci://ghcr.io/grafana/helm-charts/loki
+targetRevision: 6.51.0
+syncWave: "10"
+serverSideApply: true
