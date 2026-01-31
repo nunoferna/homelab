@@ -1,0 +1,55 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: standard-governance
+  annotations:
+    pod-policies.kyverno.io/autogen-controllers: none
+spec:
+  validationFailureAction: Enforce
+  background: true
+  rules:
+    # 1. Require Standard Labels (Critical for Cost & Debugging)
+    - name: require-labels
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kyverno
+                - argocd
+      validate:
+        message: "Pods must have app.kubernetes.io/name label."
+        pattern:
+          metadata:
+            labels:
+              app.kubernetes.io/name: "?*"
+
+    # 2. Require Resource Requests/Limits (Prevent OOM Kills)
+    - name: require-requests-limits
+      match:
+        any:
+          - resources:
+              kinds:
+                - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system # System critical pods manage their own resources
+                - tailscale # Network throughput is unpredictable
+      validate:
+        message: "CPU and Memory requests/limits are required."
+        pattern:
+          spec:
+            containers:
+              - resources:
+                  requests:
+                    memory: "?*"
+                    cpu: "?*"
+                  limits:
+                    memory: "?*"
