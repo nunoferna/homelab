@@ -7,3 +7,8 @@ resource "vault_policy" "backstage" {
   name   = "backstage"
   policy = file("${path.module}/policies/backstage.hcl")
 }
+
+resource "vault_policy" "tailscale" {
+  name   = "tailscale"
+  policy = file("${path.module}/policies/tailscale.hcl")
+}

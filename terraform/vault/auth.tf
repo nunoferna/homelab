@@ -28,3 +28,12 @@ resource "vault_kubernetes_auth_backend_role" "backstage" {
   token_ttl                        = 3600
   token_policies                   = [vault_policy.backstage.name]
 }
+
+resource "vault_kubernetes_auth_backend_role" "tailscale" {
+  backend                          = vault_auth_backend.kubernetes.path
+  role_name                        = "tailscale"
+  bound_service_account_names      = ["operator"]
+  bound_service_account_namespaces = ["tailscale"]
+  token_ttl                        = 3600
+  token_policies                   = [vault_policy.tailscale.name]
+}
