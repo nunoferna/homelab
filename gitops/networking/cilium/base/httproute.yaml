@@ -8,7 +8,7 @@ spec:
     - name: gateway
       namespace: gateway
   hostnames:
-    - hubble.home.lab
+    - hubble.apps.internal
   rules:
     - backendRefs:
         - name: hubble-ui

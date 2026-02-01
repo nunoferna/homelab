@@ -1,5 +1,5 @@
 global:
-  domain: argocd.home.lab
+  domain: argocd.apps.internal
 
 configs:
   params:
@@ -12,4 +12,4 @@ server:
       - name: gateway
         namespace: gateway
     hostnames:
-      - argocd.home.lab
+      - argocd.apps.internal

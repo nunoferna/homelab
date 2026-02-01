@@ -8,7 +8,7 @@ spec:
     - name: gateway
       namespace: gateway
   hostnames:
-    - backstage.home.lab
+    - backstage.apps.internal
   rules:
     - backendRefs:
         - name: backstage

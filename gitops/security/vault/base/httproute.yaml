@@ -8,7 +8,7 @@ spec:
     - name: gateway
       namespace: gateway
   hostnames:
-    - vault.home.lab
+    - vault.apps.internal
   rules:
     - backendRefs:
         - name: vault-ui

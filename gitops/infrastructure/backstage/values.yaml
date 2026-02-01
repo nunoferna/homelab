@@ -37,9 +37,9 @@ backstage:
   appConfig:
     app:
       title: "Homelab Portal"
-      baseUrl: https://backstage.home.lab
+      baseUrl: https://backstage.apps.internal
     backend:
-      baseUrl: https://backstage.home.lab
+      baseUrl: https://backstage.apps.internal
       database:
         client: pg
         connection:

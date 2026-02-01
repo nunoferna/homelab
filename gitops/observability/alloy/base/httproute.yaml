@@ -8,7 +8,7 @@ spec:
     - name: gateway
       namespace: gateway
   hostnames:
-    - alloy.home.lab
+    - alloy.apps.internal
   rules:
     - backendRefs:
         - name: alloy

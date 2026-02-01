@@ -1,6 +1,6 @@
 resource "tailscale_dns_nameservers" "global_dns" {
   nameservers = [
-    "192.168.1.10", # Pi-hole
+    "192.168.1.253", # Pi-hole
   ]
 }
 
@@ -9,6 +9,6 @@ resource "tailscale_dns_preferences" "params" {
 }
 
 resource "tailscale_dns_split_nameservers" "home_lab" {
-  domain      = "home.lab"
-  nameservers = ["192.168.1.10"]
+  domain      = "apps.internal"
+  nameservers = ["192.168.1.253"]
 }

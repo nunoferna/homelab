@@ -30,7 +30,7 @@ resource "vault_pki_secret_backend_config_urls" "config_urls" {
   crl_distribution_points = ["http://vault.vault.svc:8200/v1/pki/crl"]
 }
 
-# Create PKI Role for *.home.lab
+# Create PKI Role for *.apps.internal
 resource "vault_pki_secret_backend_role" "domain" {
   backend               = vault_mount.pki.path
   name                  = "domain"
@@ -39,7 +39,7 @@ resource "vault_pki_secret_backend_role" "domain" {
   allow_ip_sans         = true
   key_type              = "rsa"
   key_bits              = 2048
-  allowed_domains       = ["home.lab"]
+  allowed_domains       = ["apps.internal"]
   allow_subdomains      = true
   allow_glob_domains    = true
   allow_any_name        = false
