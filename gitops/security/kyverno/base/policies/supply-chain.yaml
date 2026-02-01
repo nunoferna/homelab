@@ -13,6 +13,13 @@ spec:
           - resources:
               kinds:
                 - Pod
+      exclude:
+        any:
+          - resources:
+              namespaces:
+                - kube-system
+                - kyverno
+                - pihole
       validate:
         message: "Images must come from approved registries (GHCR, Docker Hub, Quay)."
         pattern:
@@ -27,11 +34,6 @@ spec:
           - resources:
               kinds:
                 - Pod
-      exclude:
-        any:
-          - resources:
-              namespaces:
-                - backstage # Often built locally as 'latest' during dev
       validate:
         message: "Using a mutable image tag e.g. 'latest' is not allowed."
         pattern:

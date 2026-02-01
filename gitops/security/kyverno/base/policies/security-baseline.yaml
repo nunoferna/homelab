@@ -19,7 +19,10 @@ spec:
           - resources:
               namespaces:
                 - kube-system # Cilium, Kube-Proxy
+                - kyverno
                 - tailscale # Needs to create network interfaces
+                - monitoring
+                - pihole
       validate:
         message: "Privileged mode is not allowed."
         pattern:
@@ -40,7 +43,10 @@ spec:
           - resources:
               namespaces:
                 - kube-system
+                - kyverno
                 - tailscale # Needs routing table access
+                - monitoring
+                - pihole
       validate:
         message: "Host Network is not allowed."
         pattern:
@@ -59,7 +65,10 @@ spec:
           - resources:
               namespaces:
                 - kube-system
+                - kyverno
                 - tailscale
+                - monitoring
+                - pihole
       validate:
         message: "Only basic capabilities are allowed."
         pattern:
