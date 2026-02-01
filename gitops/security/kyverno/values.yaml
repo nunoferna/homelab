@@ -16,6 +16,12 @@ reportsController:
   serviceMonitor:
     enabled: true
 
+grafana:
+  enabled: true
+  namespace: monitoring
+  labels:
+    grafana_dashboard: "1"
+
 config:
   resourceFilters:
     - "[Event,*,*]"
