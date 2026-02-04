@@ -1,7 +1,6 @@
 appName: pihole
 namespace: pihole
-chart: pihole
-repoURL: https://mojo2600.github.io/pihole-kubernetes/
-targetRevision: 2.35.0
+repoURL: oci://ghcr.io/nunoferna/charts/pihole
+targetRevision: 0.1.5
 syncWave: "3"
 noBase: true
