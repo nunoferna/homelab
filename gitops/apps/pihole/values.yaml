@@ -2,6 +2,8 @@ networking:
   hostNetwork: true
 
 pihole:
+  web:
+    password: "Kg3yjQ0tGK1fbGrm"
   lists:
     adlists:
       # HaGeZi Collections
@@ -44,12 +46,9 @@ serviceDns:
 
 metrics:
   enabled: true
-  image:
-    repository: ekofr/pihole-exporter
-    tag: v1.2.0
-    pullPolicy: IfNotPresent
-  service:
-    type: ClusterIP
+  env:
+    - name: PIHOLE_PASSWORD
+      value: "Kg3yjQ0tGK1fbGrm"
   dashboards:
     enabled: true
   serviceMonitor:
