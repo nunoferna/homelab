@@ -1,9 +1,25 @@
 networking:
   hostNetwork: true
 
+podAnnotations:
+  vault.hashicorp.com/agent-inject: "true"
+  vault.hashicorp.com/role: "pihole"
+  # Pre-populate secrets before main container starts
+  vault.hashicorp.com/agent-pre-populate-only: "true"
+  # Inject secret as a file at /vault/secrets/web-password
+  vault.hashicorp.com/agent-inject-secret-web-password: "secret/data/pihole/credentials"
+  vault.hashicorp.com/agent-inject-template-web-password: |
+    {{ with secret "secret/data/pihole/credentials" -}}
+    {{ .Data.data.password }}
+    {{- end }}
+
+extraEnv:
+  - name: FTLCONF_webserver_api_password
+    value: "file:/vault/secrets/web-password"
+
 pihole:
   web:
-    password: "Kg3yjQ0tGK1fbGrm"
+    password: "file:/vault/secrets/web-password"
   lists:
     adlists:
       # HaGeZi Collections
@@ -48,7 +64,7 @@ metrics:
   enabled: true
   env:
     - name: PIHOLE_PASSWORD
-      value: "Kg3yjQ0tGK1fbGrm"
+      value: "file:/vault/secrets/web-password"
   dashboards:
     enabled: true
   serviceMonitor:
