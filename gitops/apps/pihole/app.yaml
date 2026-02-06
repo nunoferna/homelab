@@ -1,6 +1,6 @@
 appName: pihole
 namespace: pihole
 repoURL: oci://ghcr.io/nunoferna/charts/pihole
-targetRevision: 0.2.4
+targetRevision: 0.3.7
 syncWave: "3"
 noBase: true

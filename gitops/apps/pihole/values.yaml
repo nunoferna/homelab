@@ -6,20 +6,25 @@ podAnnotations:
   vault.hashicorp.com/role: "pihole"
   # Pre-populate secrets before main container starts
   vault.hashicorp.com/agent-pre-populate-only: "true"
-  # Inject secret as a file at /vault/secrets/web-password
+  # Inject secret as environment variable export statement
   vault.hashicorp.com/agent-inject-secret-web-password: "secret/data/pihole/credentials"
   vault.hashicorp.com/agent-inject-template-web-password: |
-    {{ with secret "secret/data/pihole/credentials" -}}
+    {{- with secret "secret/data/pihole/credentials" -}}
+    export FTLCONF_webserver_api_password="{{ .Data.data.password }}"
+    {{- end }}
+  vault.hashicorp.com/agent-inject-secret-metrics-password: "secret/data/pihole/credentials"
+  vault.hashicorp.com/agent-inject-template-metrics-password: |
+    {{- with secret "secret/data/pihole/credentials" -}}
     {{ .Data.data.password }}
     {{- end }}
 
-extraEnv:
-  - name: FTLCONF_webserver_api_password
-    value: "file:/vault/secrets/web-password"
+command: ["/bin/bash", "-c"]
+args:
+  - source /vault/secrets/web-password && exec start.sh
 
 pihole:
   web:
-    password: "file:/vault/secrets/web-password"
+    skipPasswordEnv: true
   lists:
     adlists:
       # HaGeZi Collections
@@ -53,21 +58,54 @@ pihole:
   ftl:
     dns:
       upstreams:
-        - "1.0.0.1"
-        - "1.1.1.1"
-
-serviceDns:
-  enabled: true
-  type: ClusterIP
+        - 1.0.0.1
+        - 1.1.1.1
+      service:
+        enabled: true
+        type: ClusterIP
 
 metrics:
-  enabled: true
-  env:
-    - name: PIHOLE_PASSWORD
-      value: "file:/vault/secrets/web-password"
+  enabled: false
   dashboards:
     enabled: true
   serviceMonitor:
     enabled: true
     labels:
       release: kube-prometheus-stack
+  initContainers:
+    - name: prepare-metrics-env
+      image: busybox:latest
+      command: ["sh", "-c"]
+      args:
+        - |
+          # Wait for vault secrets to be available
+          while [ ! -f /vault/secrets/metrics-password ]; do
+            echo "Waiting for Vault secrets..."
+            sleep 1
+          done
+          PASSWORD=$(cat /vault/secrets/metrics-password)
+          cp /bin/sh /shared/sh
+          cat > /shared/run-exporter.sh << 'EOF'
+          export PIHOLE_PASSWORD="PASSWORD_PLACEHOLDER"
+          exec /root/pihole-exporter
+          EOF
+          sed -i "s|PASSWORD_PLACEHOLDER|${PASSWORD}|" /shared/run-exporter.sh
+          chmod +x /shared/run-exporter.sh
+      volumeMounts:
+        - name: metrics-wrapper
+          mountPath: /shared
+  command: ["/shared/sh", "/shared/run-exporter.sh"]
+  volumeMounts:
+    - name: metrics-wrapper
+      mountPath: /shared
+
+extraVolumes:
+  - name: metrics-wrapper
+    emptyDir: {}
+
+securityContext:
+  capabilities:
+    add:
+      - SETUID
+      - SETGID
+      - SETPCAP

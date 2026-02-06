@@ -12,3 +12,8 @@ resource "vault_policy" "tailscale" {
   name   = "tailscale"
   policy = file("${path.module}/policies/tailscale.hcl")
 }
+
+resource "vault_policy" "pihole" {
+  name   = "pihole"
+  policy = file("${path.module}/policies/pihole.hcl")
+}

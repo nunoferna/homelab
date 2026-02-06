@@ -37,3 +37,12 @@ resource "vault_kubernetes_auth_backend_role" "tailscale" {
   token_ttl                        = 3600
   token_policies                   = [vault_policy.tailscale.name]
 }
+
+resource "vault_kubernetes_auth_backend_role" "pihole" {
+  backend                          = vault_auth_backend.kubernetes.path
+  role_name                        = "pihole"
+  bound_service_account_names      = ["pihole"]
+  bound_service_account_namespaces = ["pihole"]
+  token_ttl                        = 3600
+  token_policies                   = [vault_policy.pihole.name]
+}
