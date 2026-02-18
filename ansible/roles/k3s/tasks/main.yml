@@ -53,7 +53,7 @@
       ansible.builtin.get_url:
         url: https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
         dest: /tmp/get_helm.sh
-        mode: '0700'
+        mode: "0700"
 
     - name: Run Helm installation script
       ansible.builtin.command: /tmp/get_helm.sh
@@ -70,7 +70,27 @@
     release_namespace: kube-system
     create_namespace: true
     values_files:
-      - "{{ playbook_dir }}/../../gitops/infrastructure/cilium/values.yaml"
+      - "{{ playbook_dir }}/../../gitops/networking/cilium/values.yaml"
+    values:
+      prometheus:
+        serviceMonitor:
+          enabled: false
+      operator:
+        prometheus:
+          serviceMonitor:
+            enabled: false
+      envoy:
+        prometheus:
+          serviceMonitor:
+            enabled: false
+      hubble:
+        metrics:
+          serviceMonitor:
+            enabled: false
+        relay:
+          prometheus:
+            serviceMonitor:
+              enabled: false
   environment:
     KUBECONFIG: "{{ k3s_kubeconfig }}"
   tags: [k3s, cilium]
