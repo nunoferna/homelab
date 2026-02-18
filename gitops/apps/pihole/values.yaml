@@ -103,9 +103,16 @@ extraVolumes:
   - name: metrics-wrapper
     emptyDir: {}
 
-securityContext:
-  capabilities:
-    add:
-      - SETUID
-      - SETGID
-      - SETPCAP
+resources:
+  limits:
+    memory: 1Gi   # <-- Increased from 256Mi
+    cpu: 500m
+  requests:
+    memory: 512Mi # <-- Increased from 128Mi
+    cpu: 100m
+
+persistence:
+  etcPihole:
+    enabled: true
+    accessMode: ReadWriteOnce
+    size: 5Gi
