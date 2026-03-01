@@ -4,4 +4,3 @@ repoURL: https://github.com/nunoferna/pihole-helm.git
 targetRevision: main
 chartPath: charts/pihole
 syncWave: "3"
-noBase: true
