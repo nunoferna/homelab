@@ -1,6 +1,7 @@
 appName: pihole
 namespace: pihole
-repoURL: oci://ghcr.io/nunoferna/charts/pihole
-targetRevision: HEAD
+repoURL: https://github.com/nunoferna/pihole-helm.git
+targetRevision: main
+chartPath: charts/pihole
 syncWave: "3"
 noBase: true

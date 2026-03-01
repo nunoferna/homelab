@@ -28,7 +28,7 @@ spec:
       sources:
         - repoURL: "{{.repoURL}}"
           targetRevision: "{{.targetRevision}}"
-          path: "."
+          path: '{{ default "." .chartPath }}'
           helm:
             valueFiles:
               - "$values/{{.src.path.path}}/values.yaml"
@@ -82,7 +82,7 @@ spec:
       sources:
         - repoURL: "{{.repoURL}}"
           targetRevision: "{{.targetRevision}}"
-          path: "."
+          path: '{{ default "." .chartPath }}'
           helm:
             valueFiles:
               - "$values/{{.src.path.path}}/values.yaml"
