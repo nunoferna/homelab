@@ -1,5 +1,4 @@
-networking:
-  hostNetwork: true
+replicas: 2
 
 podAnnotations:
   vault.hashicorp.com/agent-inject: "true"
@@ -44,6 +43,7 @@ pihole:
       - address: https://raw.githubusercontent.com/anudeepND/blacklist/master/adservers.txt
       - address: https://v.firebog.net/hosts/Easylist.txt
       - address: https://raw.githubusercontent.com/FadeMind/hosts.extras/master/UncheckyAds/hosts
+
       # Firebog Tracking & Telemetry Lists
       - address: https://v.firebog.net/hosts/Easyprivacy.txt
       - address: https://v.firebog.net/hosts/Prigent-Ads.txt
@@ -62,7 +62,7 @@ pihole:
         - 1.1.1.1
       service:
         enabled: true
-        type: ClusterIP
+        type: LoadBalancer
 
 metrics:
   enabled: false
