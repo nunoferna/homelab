@@ -17,3 +17,8 @@ resource "vault_policy" "pihole" {
   name   = "pihole"
   policy = file("${path.module}/policies/pihole.hcl")
 }
+
+resource "vault_policy" "external_secrets" {
+  name   = "external-secrets"
+  policy = file("${path.module}/policies/external-secrets.hcl")
+}

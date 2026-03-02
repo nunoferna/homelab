@@ -4,5 +4,8 @@ server:
   service:
     type: ClusterIP
 
+injector:
+  enabled: false
+
 ui:
   enabled: true

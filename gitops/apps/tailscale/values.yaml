@@ -1,25 +1,2 @@
-oauthSecretVolume:
-  emptyDir:
-    medium: Memory
-
-operatorConfig:
-  extraEnv:
-    - name: CLIENT_ID_FILE
-      value: /vault/secrets/client_id
-    - name: CLIENT_SECRET_FILE
-      value: /vault/secrets/client_secret
-
-  podAnnotations:
-    vault.hashicorp.com/agent-inject: "true"
-    vault.hashicorp.com/role: "tailscale"
-    vault.hashicorp.com/agent-inject-secret-client_id: "secret/data/tailscale/credentials"
-    vault.hashicorp.com/agent-inject-template-client_id: |
-      {{- with secret "secret/data/tailscale/credentials" -}}
-      {{ .Data.data.client_id }}
-      {{- end -}}
-    vault.hashicorp.com/agent-inject-secret-client_secret: "secret/data/tailscale/credentials"
-    vault.hashicorp.com/agent-inject-template-client_secret: |
-      {{- with secret "secret/data/tailscale/credentials" -}}
-      {{ .Data.data.client_secret }}
-      {{- end -}}
-    vault.hashicorp.com/agent-pre-populate-only: "true"
+# The 'operator-oauth' Secret is managed by the ExternalSecret in base/.
+# The tailscale operator reads it natively; no overrides needed here.
