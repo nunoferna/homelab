@@ -1,29 +1,9 @@
 replicas: 2
 
-podAnnotations:
-  vault.hashicorp.com/agent-inject: "true"
-  vault.hashicorp.com/role: "pihole"
-  # Pre-populate secrets before main container starts
-  vault.hashicorp.com/agent-pre-populate-only: "true"
-  # Inject secret as environment variable export statement
-  vault.hashicorp.com/agent-inject-secret-web-password: "secret/data/pihole/credentials"
-  vault.hashicorp.com/agent-inject-template-web-password: |
-    {{- with secret "secret/data/pihole/credentials" -}}
-    export FTLCONF_webserver_api_password="{{ .Data.data.password }}"
-    {{- end }}
-  vault.hashicorp.com/agent-inject-secret-metrics-password: "secret/data/pihole/credentials"
-  vault.hashicorp.com/agent-inject-template-metrics-password: |
-    {{- with secret "secret/data/pihole/credentials" -}}
-    {{ .Data.data.password }}
-    {{- end }}
-
-command: ["/bin/bash", "-c"]
-args:
-  - source /vault/secrets/web-password && exec start.sh
-
 pihole:
   web:
-    skipPasswordEnv: true
+    existingSecret: "pihole-web-password"
+    passwordSecretKey: "password"
   ftl:
     dns:
       listeningMode: "ALL"
@@ -78,36 +58,12 @@ metrics:
     enabled: true
     labels:
       release: kube-prometheus-stack
-  initContainers:
-    - name: prepare-metrics-env
-      image: busybox:latest
-      command: ["sh", "-c"]
-      args:
-        - |
-          # Wait for vault secrets to be available
-          while [ ! -f /vault/secrets/metrics-password ]; do
-            echo "Waiting for Vault secrets..."
-            sleep 1
-          done
-          PASSWORD=$(cat /vault/secrets/metrics-password)
-          cp /bin/sh /shared/sh
-          cat > /shared/run-exporter.sh << 'EOF'
-          export PIHOLE_PASSWORD="PASSWORD_PLACEHOLDER"
-          exec /root/pihole-exporter
-          EOF
-          sed -i "s|PASSWORD_PLACEHOLDER|${PASSWORD}|" /shared/run-exporter.sh
-          chmod +x /shared/run-exporter.sh
-      volumeMounts:
-        - name: metrics-wrapper
-          mountPath: /shared
-  command: ["/shared/sh", "/shared/run-exporter.sh"]
-  volumeMounts:
-    - name: metrics-wrapper
-      mountPath: /shared
-
-extraVolumes:
-  - name: metrics-wrapper
-    emptyDir: {}
+  env:
+    - name: PIHOLE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: pihole-web-password
+          key: password
 
 resources:
   limits:

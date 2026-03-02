@@ -1,32 +1,21 @@
 backstage:
   command:
-    - sh
+    - node
   args:
-    - -c
-    - |
-      . /vault/secrets/database
-      . /vault/secrets/github
-      exec node packages/backend \
-        --config /app/app-config.yaml \
-        --config /app/app-config-from-configmap.yaml
-  podAnnotations:
-    vault.hashicorp.com/agent-inject: "true"
-    vault.hashicorp.com/role: "backstage"
-    vault.hashicorp.com/agent-inject-secret-database: "database/creds/backstage-role"
-    vault.hashicorp.com/agent-inject-template-database: |
-      {{ `{{- with secret "database/creds/backstage-role" -}}` }}
-      export POSTGRES_USER="{{ `{{ .Data.username }}` }}"
-      export POSTGRES_PASSWORD="{{ `{{ .Data.password }}` }}"
-      {{ `{{- end -}}` }}
-    vault.hashicorp.com/agent-inject-secret-github: "secret/data/backstage/github"
-    vault.hashicorp.com/agent-inject-template-github: |
-      {{ `{{- with secret "secret/data/backstage/github" -}}` }}
-      export GITHUB_CLIENT_ID="{{ `{{ .Data.data.client_id }}` }}"
-      export GITHUB_CLIENT_SECRET="{{ `{{ .Data.data.client_secret }}` }}"
-      export GITHUB_APP_ID="{{ `{{ .Data.data.app_id }}` }}"
-      export GITHUB_PRIVATE_KEY="{{ `{{ .Data.data.private_key }}` }}"
-      {{ `{{- end -}}` }}
-    vault.hashicorp.com/agent-pre-populate-only: "true"
+    - packages/backend
+    - --config
+    - /app/app-config.yaml
+    - --config
+    - /app/app-config-from-configmap.yaml
+  # ESO creates 'backstage-github' and 'backstage-database' Secrets.
+  # Their keys (GITHUB_CLIENT_ID, POSTGRES_USER, etc.) are available as env vars,
+  # which Backstage's appConfig substitution (${VAR}) picks up automatically.
+  extraEnvVarsFrom:
+    - secretRef:
+        name: backstage-github
+    - secretRef:
+        name: backstage-database
+  podAnnotations: {}
 
   image:
     registry: ghcr.io

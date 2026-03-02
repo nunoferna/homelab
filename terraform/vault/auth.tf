@@ -46,3 +46,13 @@ resource "vault_kubernetes_auth_backend_role" "pihole" {
   token_ttl                        = 3600
   token_policies                   = [vault_policy.pihole.name]
 }
+
+# External Secrets Operator — single role for all namespaces' ClusterSecretStores
+resource "vault_kubernetes_auth_backend_role" "external_secrets" {
+  backend                          = vault_auth_backend.kubernetes.path
+  role_name                        = "external-secrets"
+  bound_service_account_names      = ["external-secrets"]
+  bound_service_account_namespaces = ["external-secrets"]
+  token_ttl                        = 3600
+  token_policies                   = [vault_policy.external_secrets.name]
+}
