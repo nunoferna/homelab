@@ -6,5 +6,13 @@ disable:
 flannel-backend: "none"
 disable-network-policy: true
 prefer-bundled-bin: true
-write-kubeconfig-mode: "0644"
+write-kubeconfig-mode: "0600"
 disable-kube-proxy: true
+secrets-encryption: true
+
+kube-apiserver-arg:
+  - "audit-policy-file=/var/lib/rancher/k3s/server/audit.yaml"
+  - "audit-log-path=/var/lib/rancher/k3s/server/logs/audit.log"
+  - "audit-log-maxage=30"
+  - "audit-log-maxbackup=10"
+  - "audit-log-maxsize=100"

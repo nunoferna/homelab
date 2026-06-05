@@ -84,3 +84,34 @@
       - "Gateway: {{ network_gateway }}"
       - "DNS Servers: {{ network_dns_servers | join(', ') }}"
   tags: network
+
+- name: Install nftables firewall
+  ansible.builtin.apt:
+    name: nftables
+    state: present
+    update_cache: true
+  when: network_firewall_enabled
+  tags: [network, firewall]
+  become: true
+
+- name: Deploy nftables firewall rules
+  ansible.builtin.template:
+    src: nftables.conf.j2
+    dest: /etc/nftables.conf
+    owner: root
+    group: root
+    mode: "0600"
+    validate: "nft -c -f %s"
+  register: network_nftables_config
+  when: network_firewall_enabled
+  tags: [network, firewall]
+  become: true
+
+- name: Enable nftables firewall
+  ansible.builtin.systemd:
+    name: nftables
+    enabled: true
+    state: "{{ 'restarted' if network_nftables_config.changed else 'started' }}"
+  when: network_firewall_enabled
+  tags: [network, firewall]
+  become: true

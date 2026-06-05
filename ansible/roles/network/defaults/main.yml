@@ -7,3 +7,14 @@ network_gateway: 192.168.1.254
 network_dns_servers:
   - "1.1.1.1"
   - "1.0.0.1"
+
+network_firewall_enabled: true
+network_firewall_trusted_ipv4_cidrs:
+  - "192.168.1.0/24"
+network_firewall_trusted_ipv6_cidrs:
+  - "fd00::/64"
+network_firewall_allowed_tcp_ports:
+  - 22
+  - 80
+  - 443
+  - 6443

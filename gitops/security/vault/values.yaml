@@ -1,8 +1,39 @@
 server:
   standalone:
     enabled: true
+    config: |
+      ui = true
+
+      listener "tcp" {
+        address = "[::]:8200"
+        cluster_address = "[::]:8201"
+        tls_disable = 1
+      }
+
+      storage "file" {
+        path = "/vault/data"
+      }
+
+      seal "awskms" {}
+
   service:
     type: ClusterIP
+  extraSecretEnvironmentVars:
+    - envName: VAULT_SEAL_TYPE
+      secretName: vault-awskms-credentials
+      secretKey: VAULT_SEAL_TYPE
+    - envName: AWS_ACCESS_KEY_ID
+      secretName: vault-awskms-credentials
+      secretKey: AWS_ACCESS_KEY_ID
+    - envName: AWS_SECRET_ACCESS_KEY
+      secretName: vault-awskms-credentials
+      secretKey: AWS_SECRET_ACCESS_KEY
+    - envName: AWS_REGION
+      secretName: vault-awskms-credentials
+      secretKey: AWS_REGION
+    - envName: VAULT_AWSKMS_SEAL_KEY_ID
+      secretName: vault-awskms-credentials
+      secretKey: VAULT_AWSKMS_SEAL_KEY_ID
 
 injector:
   enabled: false

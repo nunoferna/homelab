@@ -41,6 +41,6 @@
     state: restarted
   when:
     - k3s_exists.stat.exists
-    - k3s_config_deployed is defined
-    - k3s_config_deployed.changed
+    - (k3s_config_deployed is defined and k3s_config_deployed.changed) or
+      (k3s_audit_policy_deployed is defined and k3s_audit_policy_deployed.changed)
   tags: install

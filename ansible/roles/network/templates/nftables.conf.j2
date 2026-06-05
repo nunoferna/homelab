@@ -1,0 +1,36 @@
+# Managed by Ansible
+
+flush ruleset
+
+table inet filter {
+  set allowed_tcp_ports {
+    type inet_service
+    elements = { {{ network_firewall_allowed_tcp_ports | map('int') | join(', ') }} }
+  }
+
+  chain input {
+    type filter hook input priority filter; policy drop;
+
+    ct state invalid drop
+    ct state established,related accept
+    iif "lo" accept
+
+    ip protocol icmp accept
+    ip6 nexthdr ipv6-icmp accept
+
+{% for cidr in network_firewall_trusted_ipv4_cidrs %}
+    ip saddr {{ cidr }} tcp dport @allowed_tcp_ports accept
+{% endfor %}
+{% for cidr in network_firewall_trusted_ipv6_cidrs %}
+    ip6 saddr {{ cidr }} tcp dport @allowed_tcp_ports accept
+{% endfor %}
+  }
+
+  chain forward {
+    type filter hook forward priority filter; policy accept;
+  }
+
+  chain output {
+    type filter hook output priority filter; policy accept;
+  }
+}

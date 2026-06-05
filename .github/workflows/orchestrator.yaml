@@ -14,7 +14,9 @@ jobs:
   changes:
     runs-on: ubuntu-latest
     outputs:
+      aws_kms: ${{ steps.filter.outputs.aws_kms }}
       bootstrap: ${{ steps.filter.outputs.bootstrap }}
+      cluster_bootstrap: ${{ steps.filter.outputs.cluster_bootstrap }}
       tailscale: ${{ steps.filter.outputs.tailscale }}
       vault: ${{ steps.filter.outputs.vault }}
     steps:
@@ -23,12 +25,22 @@ jobs:
         id: filter
         with:
           filters: |
+            aws_kms:
+              - 'terraform/aws-kms/**'
+              - '.github/workflows/terraform-aws-kms.yaml'
             bootstrap:
               - 'ansible/**'
+            cluster_bootstrap:
+              - 'terraform/cluster-bootstrap/**'
+              - 'gitops/networking/cilium-resources/**'
+              - 'gitops/security/vault/**'
+              - 'gitops/security/vault-resources/**'
+              - '.github/workflows/terraform-cluster-bootstrap.yaml'
             tailscale:
               - 'terraform/tailscale/**'
             vault:
               - 'terraform/vault/**'
+              - 'gitops/security/vault/**'
 
   # Job 2: Run Bootstrap (Only if ansible files changed)
   run-bootstrap:
@@ -44,9 +56,23 @@ jobs:
     uses: ./.github/workflows/terraform-tailscale.yaml
     secrets: inherit
 
-  # Job 4: Run Vault Terraform
-  run-vault:
+  # Job 4: Run AWS KMS Terraform
+  run-aws-kms:
     needs: [changes, run-bootstrap]
-    if: ${{ always() && needs.changes.outputs.vault == 'true' && (needs.run-bootstrap.result == 'success' || needs.run-bootstrap.result == 'skipped') }}
+    if: ${{ always() && needs.changes.outputs.aws_kms == 'true' && (needs.run-bootstrap.result == 'success' || needs.run-bootstrap.result == 'skipped') }}
+    uses: ./.github/workflows/terraform-aws-kms.yaml
+    secrets: inherit
+
+  # Job 5: Run Cluster Bootstrap Terraform
+  run-cluster-bootstrap:
+    needs: [changes, run-bootstrap, run-aws-kms]
+    if: ${{ always() && needs.changes.outputs.cluster_bootstrap == 'true' && (needs.run-bootstrap.result == 'success' || needs.run-bootstrap.result == 'skipped') && (needs.run-aws-kms.result == 'success' || needs.run-aws-kms.result == 'skipped') }}
+    uses: ./.github/workflows/terraform-cluster-bootstrap.yaml
+    secrets: inherit
+
+  # Job 6: Run Vault Terraform
+  run-vault:
+    needs: [changes, run-bootstrap, run-aws-kms, run-cluster-bootstrap]
+    if: ${{ always() && needs.changes.outputs.vault == 'true' && (needs.run-bootstrap.result == 'success' || needs.run-bootstrap.result == 'skipped') && (needs.run-aws-kms.result == 'success' || needs.run-aws-kms.result == 'skipped') && (needs.run-cluster-bootstrap.result == 'success' || needs.run-cluster-bootstrap.result == 'skipped') }}
     uses: ./.github/workflows/terraform-vault.yaml
     secrets: inherit

@@ -1,3 +1,0 @@
----
-argocd_namespace: argocd
-argocd_gitops_temp_dir: /tmp/argocd-bootstrap

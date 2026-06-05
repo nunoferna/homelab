@@ -1,6 +1,0 @@
-appName: argocd
-namespace: argocd
-repoURL: oci://ghcr.io/argoproj/argo-helm/argo-cd
-targetRevision: 9.3.7
-syncWave: "-5"
-noBase: true

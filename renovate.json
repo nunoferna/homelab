@@ -1,0 +1,31 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^terraform\\/cluster-bootstrap\\/main\\.tf$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)\\n\\s*[a-zA-Z0-9_]+\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "{{{datasource}}}",
+      "depNameTemplate": "{{{depName}}}"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^gitops\\/security\\/vault\\/app\\.yaml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+) registryUrl=(?<registryUrl>\\S+)\\n[a-zA-Z0-9_]+:\\s*(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "{{{datasource}}}",
+      "depNameTemplate": "{{{depName}}}",
+      "registryUrlTemplate": "{{{registryUrl}}}"
+    }
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["terraform", "custom.regex"],
+      "groupName": "cluster bootstrap releases"
+    }
+  ]
+}

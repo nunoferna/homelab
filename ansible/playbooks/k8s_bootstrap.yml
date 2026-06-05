@@ -31,12 +31,6 @@
     - role: k3s
       tags: [k3s, kubernetes]
 
-    - role: argocd
-      tags: [argocd, gitops]
-
-    - role: vault
-      tags: [vault, secrets]
-
     - role: k8s_verify
       tags: [verify, validation]
 

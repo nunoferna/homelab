@@ -1,0 +1,3 @@
+appName: cilium-resources
+namespace: gateway
+syncWave: "2"
