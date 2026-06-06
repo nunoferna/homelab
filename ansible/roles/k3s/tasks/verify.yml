@@ -1,4 +1,3 @@
----
 - name: Wait for Kubernetes API to be responsive
   ansible.builtin.command: kubectl version --request-timeout=5s
   environment:
@@ -43,5 +42,5 @@
 
 - name: Display k3s service status
   ansible.builtin.debug:
-    msg: "K3s service is {{ k3s_service_status.status.ActiveState }}"
+    msg: K3s service is {{ k3s_service_status.status.ActiveState }}
   tags: verify

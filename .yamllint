@@ -1,0 +1,15 @@
+extends: default
+
+rules:
+  line-length: disable
+  document-start: disable
+  truthy: disable
+
+ignore: |-
+  backstage/node_modules/
+  backstage/dist/
+  backstage/dist-types/
+  gitops/bootstrap/applicationset.yaml
+  gitops/bootstrap/applicationset-helm.yaml
+  gitops/bootstrap/applicationset-oci.yaml
+  ansible/

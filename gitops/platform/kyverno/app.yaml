@@ -3,6 +3,6 @@ namespace: kyverno
 project: platform
 repoURL: oci://ghcr.io/kyverno/charts/kyverno
 targetRevision: 3.6.2
-chartPath: "."
+chartPath: .
 syncWave: "-1"
 serverSideApply: "true"

@@ -1,6 +1,6 @@
 # Cilium for k3s/Raspberry Pi.
 
-k8sServiceHost: "192.168.1.253"
+k8sServiceHost: 192.168.1.253
 k8sServicePort: "6443"
 kubeProxyReplacement: "true"
 
@@ -33,7 +33,7 @@ authentication:
   enabled: true
   mutual:
     spire:
-      enabled: false # We are not using SPIRE for now, a PR is fixing it https://github.com/cilium/cilium/issues/40533.
+      enabled: false  # We are not using SPIRE for now, a PR is fixing it https://github.com/cilium/cilium/issues/40533.
 
 operator:
   replicas: 1
@@ -44,7 +44,7 @@ operator:
   dashboards:
     enabled: true
 
-devices: "eth0"
+devices: eth0
 
 prometheus:
   metricsService: true

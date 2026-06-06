@@ -23,7 +23,7 @@ backstage:
 
   appConfig:
     app:
-      title: "Homelab Portal"
+      title: Homelab Portal
       baseUrl: https://backstage.apps.internal
     backend:
       baseUrl: https://backstage.apps.internal
@@ -54,9 +54,9 @@ backstage:
       github:
         - host: github.com
           apps:
-            - appId: "${GITHUB_APP_ID}"
-              clientId: "${GITHUB_CLIENT_ID}"
-              clientSecret: "${GITHUB_CLIENT_SECRET}"
+            - appId: ${GITHUB_APP_ID}
+              clientId: ${GITHUB_CLIENT_ID}
+              clientSecret: ${GITHUB_CLIENT_SECRET}
               privateKey: |
                 ${GITHUB_PRIVATE_KEY}
               webhookSecret: none

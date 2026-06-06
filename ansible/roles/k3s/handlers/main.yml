@@ -1,10 +1,9 @@
----
 - name: Restart k3s service
   ansible.builtin.systemd:
     name: "{{ k3s_service_name }}"
     state: restarted
     enabled: true
-  listen: "restart k3s"
+  listen: restart k3s
 
 - name: Wait for k3s service
   ansible.builtin.systemd:

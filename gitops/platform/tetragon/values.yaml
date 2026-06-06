@@ -5,8 +5,8 @@ tetragon:
   # We disable the agent DaemonSet now to prevent crash loops on Raspberry Pi OS.
   # -----------------------------------------------------------------------
   enabled: false
-  enableProcessCred: true # Was true: Shows UID/GID of process
-  enableProcessNs: true # Was true: Shows Namespace of process
+  enableProcessCred: true  # Was true: Shows UID/GID of process
+  enableProcessNs: true  # Was true: Shows Namespace of process
 
   prometheus:
     enabled: true
@@ -15,7 +15,7 @@ tetragon:
 
   export:
     mode: stdout
-    filenames: ["tetragon.log"]
+    filenames: [tetragon.log]
 
 tetragonOperator:
   prometheus:

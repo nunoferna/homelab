@@ -1,2 +1,0 @@
-# The 'operator-oauth' Secret is managed by the ExternalSecret in base/.
-# The tailscale operator reads it natively; no overrides needed here.

@@ -1,4 +1,3 @@
----
 - name: Bootstrap Kubernetes
   hosts: k8s_bootstrap
   gather_facts: true
@@ -7,7 +6,7 @@
     - name: Display bootstrap information
       ansible.builtin.debug:
         msg:
-          - "Starting bootstrap on {{ ansible_hostname }}"
+          - Starting bootstrap on {{ ansible_hostname }}
           - "OS: {{ ansible_distribution }} {{ ansible_distribution_version }}"
           - "User: {{ ansible_user_id }}"
       tags: always
@@ -17,8 +16,8 @@
         that:
           - ansible_os_family == "Debian"
           - ansible_distribution_version is version('13', '>=')
-        fail_msg: "This playbook requires Debian 13.0 or newer"
-        success_msg: "OS check passed"
+        fail_msg: This playbook requires Debian 13.0 or newer
+        success_msg: OS check passed
       tags: always
 
   roles:
@@ -46,6 +45,6 @@
     - name: Bootstrap complete
       ansible.builtin.debug:
         msg:
-          - "✓ Bootstrap completed successfully"
+          - ✓ Bootstrap completed successfully
           - "{{ final_status.stdout_lines }}"
       tags: always

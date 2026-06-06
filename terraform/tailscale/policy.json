@@ -22,10 +22,11 @@
     "grants": [
         {
             "src": [
-                "*"
+                "autogroup:member"
             ],
             "dst": [
-                "*"
+                "192.168.1.0/24",
+                "autogroup:internet"
             ],
             "ip": [
                 "*"

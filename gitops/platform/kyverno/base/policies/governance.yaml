@@ -23,11 +23,11 @@ spec:
                 - kyverno
                 - argocd
       validate:
-        message: "Pods must have app.kubernetes.io/name label."
+        message: Pods must have app.kubernetes.io/name label.
         pattern:
           metadata:
             labels:
-              app.kubernetes.io/name: "?*"
+              app.kubernetes.io/name: ?*
 
     # 2. Require Resource Requests/Limits (Prevent OOM Kills)
     - name: require-requests-limits
@@ -40,16 +40,17 @@ spec:
         any:
           - resources:
               namespaces:
-                - kube-system # System critical pods manage their own resources
-                - tailscale # Network throughput is unpredictable
+                - kube-system  # System critical pods manage their own resources
+                - tailscale  # Network throughput is unpredictable
       validate:
-        message: "CPU and Memory requests/limits are required."
+        message: CPU and Memory requests/limits are required.
         pattern:
           spec:
             containers:
               - resources:
                   requests:
-                    memory: "?*"
-                    cpu: "?*"
+                    memory: ?*
+                    cpu: ?*
                   limits:
-                    memory: "?*"
+                    memory: ?*
+                    cpu: ?*

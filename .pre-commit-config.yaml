@@ -1,4 +1,4 @@
-minimum_pre_commit_version: "3.7.0"
+minimum_pre_commit_version: 3.7.0
 
 default_install_hook_types:
   - pre-commit
@@ -27,7 +27,7 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-added-large-files
-        args: ["--maxkb=1024"]
+        args: [--maxkb=1024]
       - id: check-case-conflict
       - id: check-executables-have-shebangs
       - id: check-json
@@ -36,21 +36,32 @@ repos:
       - id: check-symlinks
       - id: check-toml
       - id: check-yaml
-        args: ["--allow-multiple-documents"]
+        args: [--allow-multiple-documents]
         exclude: ^gitops/bootstrap/applicationset.*\.yaml$
       - id: destroyed-symlinks
       - id: detect-private-key
       - id: end-of-file-fixer
       - id: forbid-submodules
       - id: mixed-line-ending
-        args: ["--fix=lf"]
+        args: [--fix=lf]
       - id: trailing-whitespace
+
+  - repo: local
+    hooks:
+      - id: yaml-format
+        name: YAML format
+        entry: python scripts/pre-commit/unquote_yaml_strings.py
+        language: python
+        additional_dependencies:
+          - ruamel.yaml==0.18.16
+        types_or: [yaml]
+        exclude: ^gitops/bootstrap/applicationset.*\.yaml$
 
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.38.0
     hooks:
       - id: yamllint
-        args: ["-c", ".yamllint.yaml"]
+        entry: yamllint --strict
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.7
@@ -61,10 +72,10 @@ repos:
     rev: v8.30.1
     hooks:
       - id: gitleaks
-        args: ["--config=.gitleaks.toml"]
+        args: [--config=.gitleaks.toml]
 
   - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.99.4
+    rev: v1.106.0
     hooks:
       - id: terraform_fmt
       - id: terraform_validate
@@ -75,10 +86,12 @@ repos:
           - --args=--minimum-failure-severity=warning
 
   - repo: https://github.com/ansible/ansible-lint
-    rev: v25.11.0
+    rev: v26.4.0
     hooks:
       - id: ansible-lint
         files: ^ansible/
+        args:
+          - ansible/
         additional_dependencies:
           - ansible-core>=2.19.0
 

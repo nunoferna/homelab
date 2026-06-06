@@ -21,8 +21,8 @@ spec:
                 - kyverno
                 - pihole
       validate:
-        message: "Images must come from approved registries (GHCR, Docker Hub, Quay)."
+        message: Images must come from approved registries (GHCR, Docker Hub, Quay).
         pattern:
           spec:
             containers:
-              - image: "ghcr.io/* | docker.io/* | quay.io/* | registry.k8s.io/* | public.ecr.aws/*"
+              - image: ghcr.io/* | docker.io/* | quay.io/* | registry.k8s.io/* | public.ecr.aws/*

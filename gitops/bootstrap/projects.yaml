@@ -6,7 +6,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-3"
 spec:
-  description: "Cluster platform components"
+  description: Cluster platform components
   sourceRepos:
     - https://github.com/nunoferna/homelab.git
     - https://grafana.github.io/helm-charts
@@ -52,7 +52,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "-3"
 spec:
-  description: "User-facing workloads"
+  description: User-facing workloads
   sourceRepos:
     - https://github.com/nunoferna/homelab.git
     - https://github.com/nunoferna/pihole-helm.git

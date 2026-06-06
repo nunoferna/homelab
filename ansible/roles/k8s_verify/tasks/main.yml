@@ -1,4 +1,3 @@
----
 - name: Wait for Kubernetes API to be responsive
   ansible.builtin.command: kubectl version --request-timeout=5s
   environment:
@@ -40,6 +39,6 @@
 - name: Display final verification status
   ansible.builtin.debug:
     msg:
-      - "✓ Kubernetes API is responsive; Terraform cluster bootstrap will install Cilium"
+      - ✓ Kubernetes API is responsive; Terraform cluster bootstrap will install Cilium
       - "{{ k8s_verify_cluster_nodes.stdout_lines }}"
   tags: verify

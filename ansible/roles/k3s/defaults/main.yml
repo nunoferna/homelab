@@ -1,4 +1,3 @@
----
 k3s_binary_path: /usr/local/bin/k3s
 k3s_service_name: k3s
 k3s_kubeconfig: "{{ kubeconfig_path }}"
@@ -16,4 +15,4 @@ k3s_install_url: https://get.k3s.io
 # Raspberry Pi specific
 k3s_rpi_cmdline_paths:
   - /boot/firmware/cmdline.txt
-k3s_rpi_cgroup_params: "cgroup_memory=1 cgroup_enable=memory"
+k3s_rpi_cgroup_params: cgroup_memory=1 cgroup_enable=memory

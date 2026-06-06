@@ -3,6 +3,6 @@ namespace: cert-manager
 project: platform
 repoURL: oci://quay.io/jetstack/charts/cert-manager
 targetRevision: v1.19.2
-chartPath: "."
+chartPath: .
 syncWave: "1"
 serverSideApply: "false"

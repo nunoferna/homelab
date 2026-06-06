@@ -3,6 +3,6 @@ namespace: external-secrets
 project: platform
 repoURL: oci://ghcr.io/external-secrets/charts/external-secrets
 targetRevision: 2.0.1
-chartPath: "."
+chartPath: .
 syncWave: "1"
 serverSideApply: "true"

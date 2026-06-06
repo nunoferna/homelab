@@ -1,6 +1,9 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["config:recommended"],
+  "pre-commit": {
+    "enabled": true
+  },
   "customManagers": [
     {
       "customType": "regex",
@@ -26,6 +29,10 @@
     {
       "matchManagers": ["terraform", "custom.regex"],
       "groupName": "cluster bootstrap releases"
+    },
+    {
+      "matchManagers": ["pre-commit"],
+      "groupName": "pre-commit hooks"
     }
   ]
 }

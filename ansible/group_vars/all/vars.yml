@@ -1,4 +1,3 @@
----
 kubeconfig_path: "{{ ansible_env.HOME }}/.kube/config"
 k8s_api_retries: 150
 k8s_api_delay: 2

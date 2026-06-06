@@ -1,4 +1,3 @@
----
 - name: Check if k3s binary exists
   ansible.builtin.stat:
     path: "{{ k3s_binary_path }}"
@@ -8,7 +7,7 @@
 - name: Download k3s install script
   ansible.builtin.get_url:
     url: "{{ k3s_install_url }}"
-    dest: "/tmp/k3s_install.sh"
+    dest: /tmp/k3s_install.sh
     mode: "0755"
   when: not k3s_exists.stat.exists
   register: k3s_script_downloaded
@@ -29,7 +28,7 @@
 
 - name: Display k3s installation status
   ansible.builtin.debug:
-    msg: "K3s has been installed"
+    msg: K3s has been installed
   when:
     - k3s_installed is defined
     - k3s_installed.changed
@@ -41,6 +40,5 @@
     state: restarted
   when:
     - k3s_exists.stat.exists
-    - (k3s_config_deployed is defined and k3s_config_deployed.changed) or
-      (k3s_audit_policy_deployed is defined and k3s_audit_policy_deployed.changed)
+    - (k3s_config_deployed is defined and k3s_config_deployed.changed) or (k3s_audit_policy_deployed is defined and k3s_audit_policy_deployed.changed)
   tags: install

@@ -2,22 +2,27 @@ replicas: 2
 
 pihole:
   web:
-    existingSecret: "pihole-web-password"
-    passwordSecretKey: "password"
+    existingSecret: pihole-web-password
+    passwordSecretKey: password
   ftl:
     dns:
-      listeningMode: "ALL"
+      listeningMode: ALL
       upstreams:
         - 1.0.0.1
         - 1.1.1.1
       service:
         enabled: true
         type: LoadBalancer
+        annotations:
+          lbipam.cilium.io/ips: 192.168.1.2
+    misc:
+      dnsmasq_lines:
+        - address=/apps.internal/192.168.1.1
     webserver:
       tls:
         cert: ""
-      domain: "pihole.apps.internal"
-      port: "80o,[::]:80o"
+      domain: pihole.apps.internal
+      port: 80o,[::]:80o
 
   lists:
     adlists:
@@ -51,18 +56,18 @@ pihole:
       - address: https://raw.githubusercontent.com/FadeMind/hosts.extras/master/add.Risk/hosts
 
   groups:
-    - name: "home"
+    - name: home
       enabled: true
       description: Home group
-    - name: "work"
+    - name: work
       enabled: true
-      description: "Work group"
+      description: Work group
 
   clients:
-    - id: "192.168.1.67"
-      comment: "My phone"
+    - id: 192.168.1.67
+      comment: My phone
       groups:
-        - "home"
+        - home
 
 metrics:
   enabled: true
@@ -81,10 +86,10 @@ metrics:
 
 resources:
   limits:
-    memory: 1Gi   # <-- Increased from 256Mi
+    memory: 1Gi
     cpu: 500m
   requests:
-    memory: 512Mi # <-- Increased from 128Mi
+    memory: 512Mi
     cpu: 100m
 
 persistence:

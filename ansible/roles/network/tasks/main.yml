@@ -1,4 +1,3 @@
----
 - name: Ensure NetworkManager is installed
   ansible.builtin.apt:
     name: network-manager
@@ -42,7 +41,7 @@
 
 - name: Configure static IP with NetworkManager
   community.general.nmcli:
-    conn_name: "static-{{ network_interface }}"
+    conn_name: static-{{ network_interface }}
     ifname: "{{ network_interface }}"
     type: ethernet
     ip4: "{{ network_ipv4_address }}/{{ network_ipv4_prefix }}"
@@ -101,7 +100,7 @@
     owner: root
     group: root
     mode: "0600"
-    validate: "nft -c -f %s"
+    validate: nft -c -f %s
   register: network_nftables_config
   when: network_firewall_enabled
   tags: [network, firewall]

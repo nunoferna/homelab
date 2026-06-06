@@ -19,7 +19,7 @@ alloy:
 
   configMap:
     create: true
-    content: |
+    content: |-
       // 1. Discovery: Find all pods
       discovery.kubernetes "pods" {
         role = "pod"

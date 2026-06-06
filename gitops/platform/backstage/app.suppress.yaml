@@ -3,6 +3,6 @@ namespace: backstage
 project: platform
 repoURL: oci://ghcr.io/backstage/charts/backstage
 targetRevision: 2.6.3
-chartPath: "."
+chartPath: .
 syncWave: "2"
 serverSideApply: "false"
