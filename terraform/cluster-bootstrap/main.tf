@@ -1,6 +1,6 @@
 locals {
   # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
-  gateway_api_version = "v1.2.1"
+  gateway_api_version = "v1.5.1"
 }
 
 resource "null_resource" "gateway_api_crds" {
@@ -38,7 +38,7 @@ resource "helm_release" "argocd" {
   name             = "argocd"
   repository       = "oci://ghcr.io/argoproj/argo-helm"
   chart            = "argo-cd"
-  version          = "9.5.18"
+  version          = "9.5.19"
   namespace        = "argocd"
   create_namespace = true
 
