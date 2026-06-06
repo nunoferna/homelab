@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ansible
+.ansible/
+.venv/
+
+# Local environment
+.env
+.env.*
+
+# Build and dependency output
+node_modules/
+dist/
+dist-types/
+coverage/

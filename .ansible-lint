@@ -1,0 +1,14 @@
+profile: production
+exclude_paths:
+  - .ansible/
+  - .venv/
+  - backstage/
+
+skip_list:
+  # The bootstrap workflow intentionally installs tools onto a local Debian host.
+  - package-latest
+  # The repository keeps YAML document starts in Ansible files for readability.
+  - yaml[document-start]
+
+warn_list:
+  - experimental

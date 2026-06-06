@@ -51,13 +51,48 @@ resource "helm_release" "argocd" {
       extraObjects = [
         {
           apiVersion = "argoproj.io/v1alpha1"
+          kind       = "AppProject"
+          metadata = {
+            name      = "bootstrap"
+            namespace = "argocd"
+          }
+          spec = {
+            description = "Argo CD bootstrap resources"
+            sourceRepos = [var.repo_url]
+            destinations = [
+              {
+                namespace = "argocd"
+                server    = "https://kubernetes.default.svc"
+              }
+            ]
+            namespaceResourceWhitelist = [
+              {
+                group = "argoproj.io"
+                kind  = "Application"
+              },
+              {
+                group = "argoproj.io"
+                kind  = "ApplicationSet"
+              },
+              {
+                group = "argoproj.io"
+                kind  = "AppProject"
+              }
+            ]
+            orphanedResources = {
+              warn = true
+            }
+          }
+        },
+        {
+          apiVersion = "argoproj.io/v1alpha1"
           kind       = "Application"
           metadata = {
             name      = "root"
             namespace = "argocd"
           }
           spec = {
-            project = "default"
+            project = "bootstrap"
             source = {
               repoURL        = var.repo_url
               targetRevision = var.repo_revision

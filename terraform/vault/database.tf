@@ -13,7 +13,7 @@ resource "vault_database_secret_backend_connection" "postgres" {
   postgresql {
     connection_url = "postgresql://{{username}}:{{password}}@backstage-postgresql.backstage.svc:5432/backstage?sslmode=disable"
     username       = "postgres"
-    password       = "rootpassword123"
+    password       = var.backstage_postgres_admin_password
   }
 
   verify_connection = false # Set true after PostgreSQL is running
@@ -25,11 +25,12 @@ resource "vault_database_secret_backend_role" "backstage" {
   name    = "backstage-role"
   db_name = vault_database_secret_backend_connection.postgres.name
   creation_statements = [
-    "CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}' SUPERUSER CREATEDB;",
+    "CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';",
+    "GRANT CONNECT ON DATABASE backstage TO \"{{name}}\";",
     "GRANT ALL PRIVILEGES ON DATABASE backstage TO \"{{name}}\";",
-    "GRANT ALL ON SCHEMA public TO \"{{name}}\";",
-    "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{{name}}\";",
-    "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\";"
+    "GRANT USAGE, CREATE ON SCHEMA public TO \"{{name}}\";",
+    "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO \"{{name}}\";",
+    "GRANT USAGE, SELECT, UPDATE ON ALL SEQUENCES IN SCHEMA public TO \"{{name}}\";"
   ]
   revocation_statements = [
     "DROP ROLE IF EXISTS \"{{name}}\";"

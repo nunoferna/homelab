@@ -1,0 +1,8 @@
+appName: vault
+namespace: vault
+project: platform
+chart: vault
+repoURL: https://helm.releases.hashicorp.com
+# renovate: datasource=helm depName=vault registryUrl=https://helm.releases.hashicorp.com
+targetRevision: 0.32.0
+syncWave: "1"

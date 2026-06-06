@@ -13,7 +13,7 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^gitops\\/security\\/vault\\/app\\.yaml$/"],
+      "managerFilePatterns": ["/^gitops\\/platform\\/vault\\/app\\.yaml$/"],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+) registryUrl=(?<registryUrl>\\S+)\\n[a-zA-Z0-9_]+:\\s*(?<currentValue>\\S+)"
       ],

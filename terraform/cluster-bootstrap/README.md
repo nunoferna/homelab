@@ -2,7 +2,7 @@
 
 Terraform owns the bootstrap releases for Cilium and Argo CD.
 
-Argo CD owns Vault and Kubernetes resources that are not part of the bootstrap Helm releases, including `gitops/security/vault`, `gitops/networking/cilium-resources`, and `gitops/security/vault-resources`.
+Argo CD owns Vault and Kubernetes resources that are not part of the bootstrap Helm releases, including `gitops/platform/vault` and `gitops/platform/cilium-resources`.
 
 Vault AWS KMS auto-unseal resources live in `terraform/aws-kms`.
 

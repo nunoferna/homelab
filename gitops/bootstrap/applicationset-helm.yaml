@@ -24,7 +24,7 @@ spec:
       annotations:
         argocd.argoproj.io/sync-wave: '{{ default "0" .syncWave }}'
     spec:
-      project: '{{ index (splitList "/" .src.path.path) 1 }}'
+      project: "{{.project}}"
       sources:
         - repoURL: "{{.repoURL}}"
           chart: "{{.chart}}"
@@ -76,7 +76,7 @@ spec:
       annotations:
         argocd.argoproj.io/sync-wave: '{{ default "0" .syncWave }}'
     spec:
-      project: '{{ index (splitList "/" .src.path.path) 1 }}'
+      project: "{{.project}}"
       sources:
         - repoURL: "{{.repoURL}}"
           chart: "{{.chart}}"

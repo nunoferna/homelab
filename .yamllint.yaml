@@ -1,0 +1,27 @@
+extends: default
+
+rules:
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  document-start: disable
+  line-length:
+    max: 400
+    level: warning
+  truthy:
+    allowed-values: ["true", "false", "on", "off"]
+  quoted-strings: disable
+
+ignore: |
+  backstage/node_modules/
+  backstage/dist/
+  backstage/dist-types/
+  gitops/bootstrap/applicationset.yaml
+  gitops/bootstrap/applicationset-helm.yaml
+  gitops/bootstrap/applicationset-oci.yaml

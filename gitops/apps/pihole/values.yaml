@@ -53,7 +53,7 @@ pihole:
   groups:
     - name: "home"
       enabled: true
-      description: "Home group"
+      description: Home group
     - name: "work"
       enabled: true
       description: "Work group"

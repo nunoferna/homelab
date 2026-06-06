@@ -1,0 +1,8 @@
+appName: backstage
+namespace: backstage
+project: platform
+repoURL: oci://ghcr.io/backstage/charts/backstage
+targetRevision: 2.6.3
+chartPath: "."
+syncWave: "2"
+serverSideApply: "false"

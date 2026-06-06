@@ -1,5 +1,0 @@
-appName: cert-manager
-namespace: cert-manager
-repoURL: oci://quay.io/jetstack/charts/cert-manager
-targetRevision: v1.19.2
-syncWave: "1"

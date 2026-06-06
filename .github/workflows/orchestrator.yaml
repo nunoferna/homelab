@@ -32,15 +32,14 @@ jobs:
               - 'ansible/**'
             cluster_bootstrap:
               - 'terraform/cluster-bootstrap/**'
-              - 'gitops/networking/cilium-resources/**'
-              - 'gitops/security/vault/**'
-              - 'gitops/security/vault-resources/**'
+              - 'gitops/platform/cilium-resources/**'
+              - 'gitops/platform/vault/**'
               - '.github/workflows/terraform-cluster-bootstrap.yaml'
             tailscale:
               - 'terraform/tailscale/**'
             vault:
               - 'terraform/vault/**'
-              - 'gitops/security/vault/**'
+              - 'gitops/platform/vault/**'
 
   # Job 2: Run Bootstrap (Only if ansible files changed)
   run-bootstrap:

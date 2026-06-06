@@ -19,20 +19,31 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: 1.14.3
+          terraform_version: 1.15.5
           terraform_wrapper: false
 
       - name: Ensure state directory exists
         run: mkdir -p /home/nof/.terraform/vault
 
-      - name: Get Vault root token from cluster
+      - name: Get Vault Terraform token
         id: vault-token
+        env:
+          VAULT_TERRAFORM_TOKEN: ${{ secrets.VAULT_TERRAFORM_TOKEN }}
         run: |
-          TOKEN=$(kubectl get secret vault-root-token -n vault -o jsonpath='{.data.token}' | base64 -d)
+          if [ -n "$VAULT_TERRAFORM_TOKEN" ]; then
+            TOKEN="$VAULT_TERRAFORM_TOKEN"
+          else
+            TOKEN=$(kubectl get secret vault-root-token -n vault -o jsonpath='{.data.token}' | base64 -d)
+          fi
           echo "::add-mask::$TOKEN"
           echo "vault_token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Require Backstage PostgreSQL admin password
+        env:
+          BACKSTAGE_POSTGRES_ADMIN_PASSWORD: ${{ secrets.BACKSTAGE_POSTGRES_ADMIN_PASSWORD }}
+        run: test -n "$BACKSTAGE_POSTGRES_ADMIN_PASSWORD"
 
       - name: Start Vault port forward
         run: |
@@ -43,7 +54,6 @@ jobs:
       - name: Terraform Format Check
         id: fmt
         run: terraform fmt -check -recursive
-        continue-on-error: true
 
       - name: Terraform Init
         id: init
@@ -58,9 +68,11 @@ jobs:
         run: terraform plan -no-color -input=false -out=tfplan
         env:
           TF_VAR_vault_token: ${{ steps.vault-token.outputs.vault_token }}
+          TF_VAR_backstage_postgres_admin_password: ${{ secrets.BACKSTAGE_POSTGRES_ADMIN_PASSWORD }}
 
       - name: Terraform Apply
         id: apply
         run: terraform apply -auto-approve -no-color tfplan
         env:
           TF_VAR_vault_token: ${{ steps.vault-token.outputs.vault_token }}
+          TF_VAR_backstage_postgres_admin_password: ${{ secrets.BACKSTAGE_POSTGRES_ADMIN_PASSWORD }}

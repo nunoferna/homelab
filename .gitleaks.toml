@@ -1,0 +1,12 @@
+title = "homelab gitleaks config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "ExternalSecret remoteRef.key values are Vault paths, not secret material"
+targetRules = ["generic-api-key"]
+condition = "AND"
+paths = ['''^gitops/(apps|platform)/.*/base/externalsecret\.ya?ml$''']
+regexTarget = "line"
+regexes = ['''^\s*key:\s+[A-Za-z0-9][A-Za-z0-9._/-]*\s*$''']

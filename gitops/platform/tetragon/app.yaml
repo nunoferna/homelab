@@ -1,0 +1,9 @@
+appName: tetragon
+namespace: kube-system
+project: platform
+chart: tetragon
+repoURL: https://helm.cilium.io
+targetRevision: 1.6.0
+syncWave: "-9"
+noBase: true
+serverSideApply: true

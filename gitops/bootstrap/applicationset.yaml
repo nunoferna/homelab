@@ -24,7 +24,7 @@ spec:
       annotations:
         argocd.argoproj.io/sync-wave: '{{ default "0" .syncWave }}'
     spec:
-      project: '{{ index (splitList "/" .src.path.path) 1 }}'
+      project: "{{.project}}"
       source:
         repoURL: https://github.com/nunoferna/homelab.git
         targetRevision: main

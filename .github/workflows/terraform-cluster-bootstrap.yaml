@@ -19,9 +19,9 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v4
         with:
-          terraform_version: 1.14.3
+          terraform_version: 1.15.5
           terraform_wrapper: false
 
       - name: Ensure state directory exists
@@ -30,7 +30,6 @@ jobs:
       - name: Terraform Format Check
         id: fmt
         run: terraform fmt -check -recursive
-        continue-on-error: true
 
       - name: Terraform Init
         id: init
@@ -39,17 +38,6 @@ jobs:
       - name: Terraform Validate
         id: validate
         run: terraform validate -no-color
-
-      - name: Import existing bootstrap Helm releases
-        run: |
-          terraform import -input=false helm_release.cilium kube-system/cilium || true
-          terraform import -input=false helm_release.argocd argocd/argocd || true
-
-      - name: Adopt existing Argo CD root application
-        run: |
-          kubectl -n argocd label application root app.kubernetes.io/managed-by=Helm --overwrite || true
-          kubectl -n argocd annotate application root meta.helm.sh/release-name=argocd --overwrite || true
-          kubectl -n argocd annotate application root meta.helm.sh/release-namespace=argocd --overwrite || true
 
       - name: Terraform Plan
         id: plan

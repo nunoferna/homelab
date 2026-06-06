@@ -1,0 +1,84 @@
+backstage:
+  command:
+    - node
+  args:
+    - packages/backend
+    - --config
+    - /app/app-config.yaml
+    - --config
+    - /app/app-config-from-configmap.yaml
+  # ESO creates 'backstage-github' and 'backstage-database' Secrets.
+  # Their keys (GITHUB_CLIENT_ID, POSTGRES_USER, etc.) are available as env vars,
+  # which Backstage's appConfig substitution (${VAR}) picks up automatically.
+  extraEnvVarsFrom:
+    - secretRef:
+        name: backstage-github
+    - secretRef:
+        name: backstage-database
+  podAnnotations: {}
+
+  image:
+    tag: 1.51.1
+    pullPolicy: IfNotPresent
+
+  appConfig:
+    app:
+      title: "Homelab Portal"
+      baseUrl: https://backstage.apps.internal
+    backend:
+      baseUrl: https://backstage.apps.internal
+      database:
+        client: pg
+        connection:
+          host: backstage-postgresql
+          port: 5432
+          user: ${POSTGRES_USER}
+          password: ${POSTGRES_PASSWORD}
+          database: backstage
+      reading:
+        allow:
+          - host: raw.githubusercontent.com
+          - host: github.com
+    signInPage: github
+    auth:
+      environment: production
+      providers:
+        github:
+          production:
+            clientId: ${GITHUB_CLIENT_ID}
+            clientSecret: ${GITHUB_CLIENT_SECRET}
+            signIn:
+              resolvers:
+                - resolver: usernameMatchingUserEntityName
+    integrations:
+      github:
+        - host: github.com
+          apps:
+            - appId: "${GITHUB_APP_ID}"
+              clientId: "${GITHUB_CLIENT_ID}"
+              clientSecret: "${GITHUB_CLIENT_SECRET}"
+              privateKey: |
+                ${GITHUB_PRIVATE_KEY}
+              webhookSecret: none
+    catalog:
+      locations:
+        - type: url
+          target: https://raw.githubusercontent.com/nunoferna/homelab/refs/heads/main/gitops/platform/backstage/catalog/users.yaml
+          rules:
+            - allow: [User]
+        - type: url
+          target: https://raw.githubusercontent.com/nunoferna/homelab/refs/heads/main/gitops/platform/backstage/catalog/groups.yaml
+          rules:
+            - allow: [Group]
+
+serviceAccount:
+  create: true
+  name: backstage
+
+postgresql:
+  enabled: true
+  auth:
+    existingSecret: backstage-postgresql-admin
+    secretKeys:
+      adminPasswordKey: postgres-password
+    database: backstage

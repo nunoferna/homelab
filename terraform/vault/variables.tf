@@ -16,14 +16,8 @@ variable "kv_mount_path" {
   default     = "secret"
 }
 
-variable "approle_token_ttl" {
-  description = "TTL for AppRole tokens in seconds"
-  type        = number
-  default     = 3600
-}
-
-variable "approle_token_max_ttl" {
-  description = "Maximum TTL for AppRole tokens in seconds"
-  type        = number
-  default     = 86400
+variable "backstage_postgres_admin_password" {
+  description = "Admin password for the Backstage PostgreSQL instance used by Vault to manage dynamic database credentials."
+  type        = string
+  sensitive   = true
 }
