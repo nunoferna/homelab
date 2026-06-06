@@ -5,7 +5,7 @@ variable "vault_addr" {
 }
 
 variable "vault_token" {
-  description = "Vault root token for Terraform operations"
+  description = "Vault token used by Terraform to manage Vault configuration. Prefer a scoped automation token over the root token."
   type        = string
   sensitive   = true
 }
