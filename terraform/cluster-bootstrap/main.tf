@@ -46,74 +46,80 @@ resource "helm_release" "argocd" {
   timeout = 600
 
   values = [
-    file("${path.module}/values/argocd.yaml"),
+    file("${path.module}/values/argocd.yaml")
+  ]
+
+  depends_on = [helm_release.cilium]
+}
+
+resource "helm_release" "argocd_bootstrap" {
+  name       = "argocd-bootstrap"
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argocd-apps"
+  version    = "2.0.2"
+  namespace  = "argocd"
+
+  wait    = true
+  timeout = 300
+
+  values = [
     yamlencode({
-      extraObjects = [
+      projects = [
         {
-          apiVersion = "argoproj.io/v1alpha1"
-          kind       = "AppProject"
-          metadata = {
-            name      = "bootstrap"
-            namespace = "argocd"
-          }
-          spec = {
-            description = "Argo CD bootstrap resources"
-            sourceRepos = [var.repo_url]
-            destinations = [
-              {
-                namespace = "argocd"
-                server    = "https://kubernetes.default.svc"
-              }
-            ]
-            namespaceResourceWhitelist = [
-              {
-                group = "argoproj.io"
-                kind  = "Application"
-              },
-              {
-                group = "argoproj.io"
-                kind  = "ApplicationSet"
-              },
-              {
-                group = "argoproj.io"
-                kind  = "AppProject"
-              }
-            ]
-            orphanedResources = {
-              warn = true
-            }
-          }
-        },
-        {
-          apiVersion = "argoproj.io/v1alpha1"
-          kind       = "Application"
-          metadata = {
-            name      = "root"
-            namespace = "argocd"
-          }
-          spec = {
-            project = "bootstrap"
-            source = {
-              repoURL        = var.repo_url
-              targetRevision = var.repo_revision
-              path           = "gitops/bootstrap"
-            }
-            destination = {
-              server    = "https://kubernetes.default.svc"
+          name        = "bootstrap"
+          namespace   = "argocd"
+          description = "Argo CD bootstrap resources"
+          sourceRepos = [var.repo_url]
+          destinations = [
+            {
               namespace = "argocd"
+              server    = "https://kubernetes.default.svc"
             }
-            syncPolicy = {
-              automated = {
-                prune    = true
-                selfHeal = true
-              }
-              syncOptions = ["CreateNamespace=true"]
+          ]
+          namespaceResourceWhitelist = [
+            {
+              group = "argoproj.io"
+              kind  = "Application"
+            },
+            {
+              group = "argoproj.io"
+              kind  = "ApplicationSet"
+            },
+            {
+              group = "argoproj.io"
+              kind  = "AppProject"
             }
+          ]
+          orphanedResources = {
+            warn = true
+          }
+        }
+      ]
+      applications = [
+        {
+          name      = "root"
+          namespace = "argocd"
+          project   = "bootstrap"
+          source = {
+            repoURL        = var.repo_url
+            targetRevision = var.repo_revision
+            path           = "gitops/bootstrap"
+          }
+          destination = {
+            server    = "https://kubernetes.default.svc"
+            namespace = "argocd"
+          }
+          syncPolicy = {
+            automated = {
+              prune    = true
+              selfHeal = true
+            }
+            syncOptions = ["CreateNamespace=true"]
           }
         }
       ]
     })
   ]
 
-  depends_on = [helm_release.cilium]
+  depends_on = [helm_release.argocd]
 }
