@@ -32,10 +32,18 @@ prometheus:
 
 grafana:
   enabled: true
+  replicas: 1
   admin:
     existingSecret: grafana-admin
     userKey: admin-user
     passwordKey: admin-password
+  resources:
+    requests:
+      cpu: 50m
+      memory: 100Mi
+    limits:
+      cpu: 200m
+      memory: 256Mi
   persistence:
     enabled: true
     size: 10Gi
