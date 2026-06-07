@@ -46,15 +46,10 @@ repos:
         args: [--fix=lf]
       - id: trailing-whitespace
 
-  - repo: local
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.21.0
     hooks:
-      - id: yaml-format
-        name: YAML format
-        entry: python scripts/pre-commit/unquote_yaml_strings.py
-        language: python
-        additional_dependencies:
-          - ruamel.yaml==0.19.1
-        types_or: [yaml]
+      - id: yamlfmt
         exclude: ^gitops/bootstrap/applicationset.*\.yaml$
 
   - repo: https://github.com/adrienverge/yamllint

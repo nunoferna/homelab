@@ -1,0 +1,9 @@
+line_ending: lf
+
+formatter:
+  type: basic
+  pad_line_comments: 2
+  retain_line_breaks: true
+  trim_trailing_whitespace: true
+  eof_newline: true
+  retain_quotes: false
