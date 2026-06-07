@@ -16,19 +16,59 @@
     },
     {
       "customType": "regex",
-      "managerFilePatterns": ["/^gitops\\/platform\\/vault\\/app\\.yaml$/"],
+      "managerFilePatterns": ["/^terraform\\/cluster-bootstrap\\/main\\.tf$/"],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+) registryUrl=(?<registryUrl>\\S+)\\n[a-zA-Z0-9_]+:\\s*(?<currentValue>\\S+)"
+        "repository\\s*=\\s*\"(?<registryUrl>https?://[^\"]+)\"\\s*\\n\\s*chart\\s*=\\s*\"(?<depName>[^\"]+)\"\\s*\\n\\s*version\\s*=\\s*\"(?<currentValue>[^\"]+)\""
       ],
-      "datasourceTemplate": "{{{datasource}}}",
+      "datasourceTemplate": "helm",
       "depNameTemplate": "{{{depName}}}",
       "registryUrlTemplate": "{{{registryUrl}}}"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^terraform\\/cluster-bootstrap\\/main\\.tf$/"],
+      "matchStrings": [
+        "repository\\s*=\\s*\"oci://(?<registryPath>[^\"]+)\"\\s*\\n\\s*chart\\s*=\\s*\"(?<chartName>[^\"]+)\"\\s*\\n\\s*version\\s*=\\s*\"(?<currentValue>[^\"]+)\""
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "{{{registryPath}}}/{{{chartName}}}",
+      "versioningTemplate": "helm"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^gitops\\/.+\\/app(?:\\.suppress)?\\.yaml$/"],
+      "matchStrings": [
+        "chart:\\s*(?<depName>\\S+)\\s*\\nrepoURL:\\s*(?<registryUrl>https?://\\S+)\\s*\\n(?:\\s*#.*\\n)*targetRevision:\\s*(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "helm",
+      "depNameTemplate": "{{{depName}}}",
+      "registryUrlTemplate": "{{{registryUrl}}}"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^gitops\\/.+\\/app(?:\\.suppress)?\\.yaml$/"],
+      "matchStrings": [
+        "repoURL:\\s*oci://(?<depName>\\S+)\\s*\\n(?:\\s*#.*\\n)*targetRevision:\\s*(?<currentValue>\\S+)"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "{{{depName}}}",
+      "versioningTemplate": "helm"
     }
   ],
   "packageRules": [
     {
-      "matchManagers": ["terraform", "custom.regex"],
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["helm", "docker"],
+      "groupName": "helm chart releases"
+    },
+    {
+      "matchManagers": ["custom.regex"],
+      "matchDatasources": ["github-releases"],
       "groupName": "cluster bootstrap releases"
+    },
+    {
+      "matchManagers": ["terraform"],
+      "groupName": "terraform dependencies"
     },
     {
       "matchManagers": ["pre-commit"],
