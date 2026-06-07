@@ -27,7 +27,7 @@ gatewayAPI:
 envoy:
   prometheus:
     serviceMonitor:
-      enabled: true
+      enabled: false
 
 authentication:
   enabled: true
@@ -40,7 +40,7 @@ operator:
   prometheus:
     metricsService: true
     serviceMonitor:
-      enabled: true
+      enabled: false
   dashboards:
     enabled: true
 
@@ -49,8 +49,10 @@ devices: eth0
 prometheus:
   metricsService: true
   enabled: true
+  # ServiceMonitor CRDs are installed later by kube-prometheus-stack.
+  # Keep Terraform-owned Cilium bootstrap independent from observability CRDs.
   serviceMonitor:
-    enabled: true
+    enabled: false
     labels:
       release: kube-prometheus-stack
 
@@ -70,7 +72,7 @@ hubble:
       - httpV2:exemplars=true;labelsContext=source_ip,source_namespace,source_workload,destination_ip,destination_namespace,destination_workload,traffic_direction
     enableOpenMetrics: true
     serviceMonitor:
-      enabled: true
+      enabled: false
     dashboards:
       enabled: true
   relay:
@@ -78,7 +80,7 @@ hubble:
     prometheus:
       enabled: true
       serviceMonitor:
-        enabled: true
+        enabled: false
   ui:
     enabled: true
     frontend:
