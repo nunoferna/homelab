@@ -3,7 +3,7 @@ namespace: kube-system
 project: platform
 chart: tetragon
 repoURL: https://helm.cilium.io
-targetRevision: 1.6.0
+targetRevision: 1.7.0
 syncWave: "-9"
 noBase: true
 serverSideApply: true

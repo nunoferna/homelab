@@ -2,7 +2,7 @@ appName: kyverno
 namespace: kyverno
 project: platform
 repoURL: oci://ghcr.io/kyverno/charts/kyverno
-targetRevision: 3.6.2
+targetRevision: 3.8.1
 chartPath: .
 syncWave: "-1"
 serverSideApply: "true"
