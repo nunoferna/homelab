@@ -1,6 +1,5 @@
 locals {
-  # renovate: datasource=github-releases depName=kubernetes-sigs/gateway-api
-  gateway_api_version = "v1.5.1"
+  gateway_api_version = "v1.4.1"
 }
 
 resource "null_resource" "gateway_api_crds" {
@@ -9,7 +8,7 @@ resource "null_resource" "gateway_api_crds" {
   }
 
   provisioner "local-exec" {
-    command = "kubectl --kubeconfig='${pathexpand(var.kubeconfig_path)}' apply -f 'https://github.com/kubernetes-sigs/gateway-api/releases/download/${local.gateway_api_version}/standard-install.yaml'"
+    command = "kubectl --kubeconfig='${pathexpand(var.kubeconfig_path)}' apply -f 'https://github.com/kubernetes-sigs/gateway-api/releases/download/${local.gateway_api_version}/experimental-install.yaml'"
   }
 }
 
