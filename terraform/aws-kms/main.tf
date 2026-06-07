@@ -14,6 +14,7 @@ module "vault_auto_unseal_kms" {
   deletion_window_in_days = 30
   enable_key_rotation     = true
   aliases                 = ["${var.name_prefix}-auto-unseal"]
+  key_administrators      = [data.aws_caller_identity.current.arn]
   source_policy_documents = [data.aws_iam_policy_document.vault_auto_unseal_kms.json]
 
   tags = {
