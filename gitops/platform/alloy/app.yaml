@@ -3,6 +3,6 @@ namespace: monitoring
 project: platform
 chart: alloy
 repoURL: https://grafana.github.io/helm-charts
-targetRevision: 1.5.3
+targetRevision: 1.8.2
 syncWave: "10"
 serverSideApply: true

@@ -2,7 +2,7 @@ appName: loki
 namespace: monitoring
 project: platform
 repoURL: oci://ghcr.io/grafana/helm-charts/loki
-targetRevision: 6.51.0
+targetRevision: 6.55.0
 chartPath: .
 syncWave: "10"
 serverSideApply: "true"
