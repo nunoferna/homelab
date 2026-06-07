@@ -6,7 +6,7 @@ disable:
 flannel-backend: none
 disable-network-policy: true
 prefer-bundled-bin: true
-write-kubeconfig-mode: "0600"
+write-kubeconfig-mode: "0644"
 disable-kube-proxy: true
 secrets-encryption: true
 

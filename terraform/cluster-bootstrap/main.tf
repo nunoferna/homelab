@@ -63,9 +63,8 @@ resource "helm_release" "argocd_bootstrap" {
 
   values = [
     yamlencode({
-      projects = [
-        {
-          name        = "bootstrap"
+      projects = {
+        bootstrap = {
           namespace   = "argocd"
           description = "Argo CD bootstrap resources"
           sourceRepos = [var.repo_url]
@@ -93,10 +92,9 @@ resource "helm_release" "argocd_bootstrap" {
             warn = true
           }
         }
-      ]
-      applications = [
-        {
-          name      = "root"
+      }
+      applications = {
+        root = {
           namespace = "argocd"
           project   = "bootstrap"
           source = {
@@ -116,7 +114,7 @@ resource "helm_release" "argocd_bootstrap" {
             syncOptions = ["CreateNamespace=true"]
           }
         }
-      ]
+      }
     })
   ]
 

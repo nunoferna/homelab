@@ -2,7 +2,7 @@ appName: pihole
 namespace: pihole
 project: apps
 repoURL: https://github.com/nunoferna/pihole-helm.git
-targetRevision: refactor/metrics
+targetRevision: main
 chartPath: charts/pihole
 syncWave: "3"
 serverSideApply: "false"
