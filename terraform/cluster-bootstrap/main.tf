@@ -55,7 +55,7 @@ resource "helm_release" "argocd_bootstrap" {
   name       = "argocd-bootstrap"
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argocd-apps"
-  version    = "2.0.2"
+  version    = "2.0.5"
   namespace  = "argocd"
 
   wait    = true
