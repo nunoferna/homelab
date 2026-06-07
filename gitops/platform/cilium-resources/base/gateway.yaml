@@ -9,6 +9,9 @@ metadata:
     cert-manager.io/renew-before: 72h
 spec:
   gatewayClassName: cilium
+  infrastructure:
+    annotations:
+      io.cilium/lb-ipam-ips: 192.168.1.1
   addresses:
     - type: IPAddress
       value: 192.168.1.1
