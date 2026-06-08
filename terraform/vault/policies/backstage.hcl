@@ -5,7 +5,7 @@ path "database/creds/backstage-role" {
 
 # Optional: Read static secrets
 path "secret/data/backstage/*" {
-  capabilities = ["read", "list"]
+  capabilities = ["read"]
 }
 
 path "secret/metadata/backstage/*" {

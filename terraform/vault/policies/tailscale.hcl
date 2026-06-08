@@ -1,5 +1,5 @@
 path "secret/data/tailscale/*" {
-  capabilities = ["read", "list"]
+  capabilities = ["read"]
 }
 
 path "secret/metadata/tailscale/*" {

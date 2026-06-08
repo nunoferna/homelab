@@ -1,5 +1,5 @@
 path "secret/data/pihole/*" {
-  capabilities = ["read", "list"]
+  capabilities = ["read"]
 }
 
 path "secret/metadata/pihole/*" {

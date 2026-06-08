@@ -23,7 +23,7 @@ resource "vault_kubernetes_auth_backend_role" "cert_manager" {
 resource "vault_kubernetes_auth_backend_role" "backstage" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "backstage"
-  bound_service_account_names      = ["backstage"]
+  bound_service_account_names      = ["vault-auth"]
   bound_service_account_namespaces = ["backstage"]
   token_ttl                        = 3600
   token_policies                   = [vault_policy.backstage.name]
@@ -32,7 +32,7 @@ resource "vault_kubernetes_auth_backend_role" "backstage" {
 resource "vault_kubernetes_auth_backend_role" "tailscale" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "tailscale"
-  bound_service_account_names      = ["operator"]
+  bound_service_account_names      = ["vault-auth"]
   bound_service_account_namespaces = ["tailscale"]
   token_ttl                        = 3600
   token_policies                   = [vault_policy.tailscale.name]
@@ -41,18 +41,17 @@ resource "vault_kubernetes_auth_backend_role" "tailscale" {
 resource "vault_kubernetes_auth_backend_role" "pihole" {
   backend                          = vault_auth_backend.kubernetes.path
   role_name                        = "pihole"
-  bound_service_account_names      = ["pihole"]
+  bound_service_account_names      = ["vault-auth"]
   bound_service_account_namespaces = ["pihole"]
   token_ttl                        = 3600
   token_policies                   = [vault_policy.pihole.name]
 }
 
-# External Secrets Operator — single role for all namespaces' ClusterSecretStores
-resource "vault_kubernetes_auth_backend_role" "external_secrets" {
+resource "vault_kubernetes_auth_backend_role" "observability" {
   backend                          = vault_auth_backend.kubernetes.path
-  role_name                        = "external-secrets"
-  bound_service_account_names      = ["external-secrets"]
-  bound_service_account_namespaces = ["external-secrets"]
+  role_name                        = "observability"
+  bound_service_account_names      = ["vault-auth"]
+  bound_service_account_namespaces = ["monitoring"]
   token_ttl                        = 3600
-  token_policies                   = [vault_policy.external_secrets.name]
+  token_policies                   = [vault_policy.observability.name]
 }
