@@ -37,7 +37,7 @@ resource "helm_release" "argocd" {
   name             = "argocd"
   repository       = "oci://ghcr.io/argoproj/argo-helm"
   chart            = "argo-cd"
-  version          = "9.5.19"
+  version          = "9.5.21"
   namespace        = "argocd"
   create_namespace = true
 
