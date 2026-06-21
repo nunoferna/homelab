@@ -1,0 +1,57 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: otel-collector
+  namespace: monitoring
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: opentelemetry-collector
+      app.kubernetes.io/instance: otel-collector
+  ingress:
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP
+            - port: "4318"
+              protocol: TCP
+            - port: "8888"
+              protocol: TCP
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "4317"
+              protocol: TCP
+            - port: "4318"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    - toEntities:
+        - kube-apiserver
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+            app.kubernetes.io/name: loki
+            app.kubernetes.io/component: gateway
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+            - port: "8080"
+              protocol: TCP

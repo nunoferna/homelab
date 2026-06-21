@@ -1,0 +1,73 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: pihole
+  namespace: pihole
+spec:
+  endpointSelector: {}
+  ingress:
+    - fromEntities:
+        - ingress
+      toPorts:
+        - ports:
+            - port: "80"
+              protocol: TCP
+          rules:
+            http:
+              - {}
+    - fromEntities:
+        - cluster
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    - fromCIDRSet:
+        - cidr: 192.168.1.0/24
+        - cidr: 100.64.0.0/10
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+      toPorts:
+        - ports:
+            - port: "9617"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    - toCIDRSet:
+        - cidr: 1.0.0.1/32
+        - cidr: 1.1.1.1/32
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+    - toFQDNs:
+        - matchName: raw.githubusercontent.com
+        - matchName: v.firebog.net
+        - matchName: adaway.org
+        - matchName: hostfiles.frogeye.fr
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP

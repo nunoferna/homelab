@@ -1,0 +1,15 @@
+# Defined Upstream Kubernetes Pod Security Standards (PSS)
+policyType: ValidatingPolicy
+
+podSecurityStandard: restricted
+podSecuritySeverity: high
+
+includeOtherPolicies:
+  - require-non-root-groups
+
+validationFailureAction: Enforce
+
+auditAnnotations:
+  policy-evaluated-by: "'kyverno-policies-helm'"
+
+autogenControllers: "DaemonSet,Deployment,Job,StatefulSet,ReplicaSet,ReplicationController,CronJob"

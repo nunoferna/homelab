@@ -25,6 +25,13 @@ deploymentMode: SingleBinary
 
 singleBinary:
   replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
   persistence:
     enabled: true
     size: 20Gi
@@ -57,9 +64,24 @@ bloomGateway:
 
 gateway:
   enabled: true
+  resources:
+    requests:
+      cpu: 25m
+      memory: 64Mi
+    limits:
+      cpu: 200m
+      memory: 128Mi
+
+networkPolicy:
+  enabled: true
+  flavor: cilium
+  egressWorld:
+    enabled: false
+  egressKubeApiserver:
+    enabled: true
 
 promtail:
-  enabled: true
+  enabled: false
 
 # Disable the Grafana bundled with Loki, because we use the one in kube-prometheus-stack
 grafana:

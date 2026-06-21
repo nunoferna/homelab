@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tetragon-policies-readme
+  namespace: kube-system
+data:
+  README.md: |-
+    # Tetragon runtime policies
+
+    These policies are intentionally observe-only. They emit Tetragon events
+    for high-signal runtime activity without blocking workloads.
+
+    Start by reviewing events in Loki from the Tetragon pod logs, then move
+    selected rules to enforcement only after the false-positive rate is known.

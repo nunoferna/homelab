@@ -1,5 +1,10 @@
 controller:
   type: daemonset
+  podSecurityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    seccompProfile:
+      type: RuntimeDefault
   tolerations:
     - effect: NoSchedule
       operator: Exists
@@ -7,6 +12,21 @@ controller:
       operator: Exists
 
 alloy:
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+
   extraEnv:
     - name: NODE_NAME
       valueFrom:

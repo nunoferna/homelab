@@ -11,6 +11,16 @@ kubelet:
   jobNameOverride: k3s-server
 
 prometheusOperator:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 100Mi
+    limits:
+      cpu: 200m
+      memory: 200Mi
+  networkPolicy:
+    enabled: true
+    flavor: cilium
   admissionWebhooks:
     enabled: false
     patch:
@@ -19,7 +29,25 @@ prometheusOperator:
     enabled: false
 
 prometheus:
+  networkPolicy:
+    enabled: true
+    flavor: cilium
   prometheusSpec:
+    containers:
+      - name: prometheus
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+        resources:
+          requests:
+            cpu: 200m
+            memory: 512Mi
+          limits:
+            cpu: "1"
+            memory: 2Gi
     serviceMonitorSelectorNilUsesHelmValues: false
     storageSpec:
       volumeClaimTemplate:
@@ -33,6 +61,12 @@ prometheus:
 grafana:
   enabled: true
   replicas: 1
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
   admin:
     existingSecret: grafana-admin
     userKey: admin-user
@@ -57,3 +91,22 @@ ingress:
 
 nodeExporter:
   enabled: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 30Mi
+    limits:
+      cpu: 200m
+      memory: 50Mi
+
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 100m
+      memory: 64Mi
+  containerSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault

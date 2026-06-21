@@ -1,0 +1,4 @@
+appName: tetragon-policies
+namespace: kube-system
+project: platform
+syncWave: "-8"

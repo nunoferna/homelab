@@ -1,0 +1,67 @@
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: vault
+  namespace: vault
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vault
+      app.kubernetes.io/instance: vault
+      component: server
+  ingress:
+    - fromEntities:
+        - ingress
+      toPorts:
+        - ports:
+            - port: "8200"
+              protocol: TCP
+          rules:
+            http:
+              - {}
+    - fromEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: cert-manager
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: external-secrets
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: monitoring
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: vault
+      toPorts:
+        - ports:
+            - port: "8200"
+              protocol: TCP
+            - port: "8201"
+              protocol: TCP
+  egress:
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+    - toEntities:
+        - kube-apiserver
+    - toFQDNs:
+        - matchPattern: "kms.*.amazonaws.com"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+    - toEndpoints:
+        - matchLabels:
+            k8s:io.kubernetes.pod.namespace: vault
+      toPorts:
+        - ports:
+            - port: "8200"
+              protocol: TCP
+            - port: "8201"
+              protocol: TCP

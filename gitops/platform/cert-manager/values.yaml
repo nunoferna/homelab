@@ -11,6 +11,7 @@ resources:
     cpu: 10m
     memory: 32Mi
   limits:
+    cpu: 100m
     memory: 128Mi
 
 webhook:
@@ -19,6 +20,7 @@ webhook:
       cpu: 10m
       memory: 32Mi
     limits:
+      cpu: 100m
       memory: 128Mi
 
 cainjector:
@@ -27,4 +29,5 @@ cainjector:
       cpu: 10m
       memory: 64Mi
     limits:
+      cpu: 100m
       memory: 256Mi

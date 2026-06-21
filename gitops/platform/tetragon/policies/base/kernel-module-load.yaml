@@ -1,0 +1,42 @@
+apiVersion: cilium.io/v1alpha1
+kind: TracingPolicy
+metadata:
+  name: kernel-module-load
+spec:
+  kprobes:
+    - call: security_kernel_module_request
+      syscall: false
+      return: true
+      args:
+        - index: 0
+          type: string
+      returnArg:
+        index: 0
+        type: int
+    - call: security_kernel_read_file
+      syscall: false
+      return: true
+      args:
+        - index: 0
+          type: file
+        - index: 1
+          type: int
+      returnArg:
+        index: 0
+        type: int
+      selectors:
+        - matchArgs:
+            - index: 1
+              operator: Equal
+              values:
+                - "2"
+    - call: do_init_module
+      syscall: false
+      args:
+        - index: 0
+          type: module
+    - call: free_module
+      syscall: false
+      args:
+        - index: 0
+          type: module
