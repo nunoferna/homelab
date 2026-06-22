@@ -1,7 +1,7 @@
 mode: daemonset
 
 fullnameOverride: otel-collector
-namespaceOverride: monitoring
+namespaceOverride: otel-collector
 
 image:
   repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
@@ -117,7 +117,7 @@ alternateConfig:
       include:
         - /var/log/pods/*/*/*.log
       exclude:
-        - /var/log/pods/monitoring_otel-collector-*/*/*.log
+        - /var/log/pods/otel-collector_otel-collector-*/*/*.log
       start_at: end
       include_file_path: true
       include_file_name: false

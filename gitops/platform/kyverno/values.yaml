@@ -19,7 +19,7 @@ reportsController:
 features:
   policyExceptions:
     enabled: true
-    namespace: monitoring
+    namespace: "*"
 
 grafana:
   enabled: true

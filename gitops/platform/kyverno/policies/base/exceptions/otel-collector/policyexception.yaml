@@ -2,7 +2,7 @@ apiVersion: policies.kyverno.io/v1
 kind: PolicyException
 metadata:
   name: otel-collector-hostpath
-  namespace: monitoring
+  namespace: otel-collector
   annotations:
     argocd.argoproj.io/sync-wave: "-1"
 spec:
@@ -14,7 +14,7 @@ spec:
   matchConditions:
     - name: only-otel-collector-agent
       expression: >-
-        request.namespace == 'monitoring' && (
+        request.namespace == 'otel-collector' && (
           (
             request.resource.group == 'apps' &&
             request.resource.resource == 'daemonsets' &&

@@ -2,7 +2,7 @@ apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
   name: otel-collector
-  namespace: monitoring
+  namespace: otel-collector
 spec:
   endpointSelector:
     matchLabels:

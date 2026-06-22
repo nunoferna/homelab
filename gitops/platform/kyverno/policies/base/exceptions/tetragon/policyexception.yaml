@@ -1,0 +1,95 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: tetragon-agent-privileged-runtime
+  namespace: kube-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: disallow-host-namespaces
+    - kind: ValidatingPolicy
+      name: disallow-host-path
+    - kind: ValidatingPolicy
+      name: disallow-privilege-escalation
+    - kind: ValidatingPolicy
+      name: disallow-privileged-containers
+    - kind: ValidatingPolicy
+      name: require-run-as-nonroot
+    - kind: ValidatingPolicy
+      name: restrict-seccomp-strict
+    - kind: ValidatingPolicy
+      name: restrict-volume-types
+  matchConditions:
+    - name: only-tetragon-agent
+      expression: >-
+        request.namespace == 'kube-system' && (
+          (
+            request.resource.group == 'apps' &&
+            request.resource.resource == 'daemonsets' &&
+            object.metadata.name == 'tetragon' &&
+            object.spec.template.spec.hostNetwork == true &&
+            object.spec.template.spec.volumes.all(volume,
+              !has(volume.hostPath) ||
+              (
+              volume.hostPath.path in [
+                '/var/run/cilium',
+                '/var/run/tetragon',
+                '/var/run/cilium/tetragon',
+                '/sys/fs/bpf',
+                '/proc'
+              ] &&
+              volume.hostPath.type in ['Directory', 'DirectoryOrCreate']
+              )
+            ) &&
+            object.spec.template.spec.containers.exists(container,
+              container.name == 'tetragon' &&
+              container.securityContext.privileged == true &&
+              container.volumeMounts.exists(mount,
+                mount.mountPath in [
+                  '/sys/fs/bpf',
+                  '/var/run/cilium',
+                  '/var/run/tetragon',
+                  '/var/run/cilium/tetragon',
+                  '/procRoot'
+                ]
+              )
+            )
+          ) ||
+          (
+            request.resource.group == '' &&
+            request.resource.resource == 'pods' &&
+            object.metadata.ownerReferences.exists(owner,
+              owner.kind == 'DaemonSet' &&
+              owner.name == 'tetragon'
+            ) &&
+            object.spec.hostNetwork == true &&
+            object.spec.volumes.all(volume,
+              !has(volume.hostPath) ||
+              (
+              volume.hostPath.path in [
+                '/var/run/cilium',
+                '/var/run/tetragon',
+                '/var/run/cilium/tetragon',
+                '/sys/fs/bpf',
+                '/proc'
+              ] &&
+              volume.hostPath.type in ['Directory', 'DirectoryOrCreate']
+              )
+            ) &&
+            object.spec.containers.exists(container,
+              container.name == 'tetragon' &&
+              container.securityContext.privileged == true &&
+              container.volumeMounts.exists(mount,
+                mount.mountPath in [
+                  '/sys/fs/bpf',
+                  '/var/run/cilium',
+                  '/var/run/tetragon',
+                  '/var/run/cilium/tetragon',
+                  '/procRoot'
+                ]
+              )
+            )
+          )
+        )

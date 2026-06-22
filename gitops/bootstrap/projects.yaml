@@ -36,6 +36,8 @@ spec:
       server: https://kubernetes.default.svc
     - namespace: monitoring
       server: https://kubernetes.default.svc
+    - namespace: otel-collector
+      server: https://kubernetes.default.svc
     - namespace: tailscale
       server: https://kubernetes.default.svc
     - namespace: vault

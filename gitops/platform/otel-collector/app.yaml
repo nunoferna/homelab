@@ -1,5 +1,5 @@
 appName: otel-collector
-namespace: monitoring
+namespace: otel-collector
 project: platform
 repoURL: https://open-telemetry.github.io/opentelemetry-helm-charts
 chart: opentelemetry-collector
