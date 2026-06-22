@@ -1,0 +1,57 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: otel-collector-hostpath
+  namespace: monitoring
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: disallow-host-path
+    - kind: ValidatingPolicy
+      name: restrict-volume-types
+  matchConditions:
+    - name: only-otel-collector-agent
+      expression: >-
+        request.namespace == 'monitoring' && (
+          (
+            request.resource.group == 'apps' &&
+            request.resource.resource == 'daemonsets' &&
+            object.metadata.name == 'otel-collector-agent' &&
+            object.spec.template.spec.volumes.exists(volume,
+              has(volume.hostPath) &&
+              volume.hostPath.path == '/var/log' &&
+              volume.hostPath.type == 'Directory'
+            ) &&
+            object.spec.template.spec.containers.exists(container,
+              container.name == 'opentelemetry-collector' &&
+              container.volumeMounts.exists(mount,
+                mount.name == 'varlog' &&
+                mount.mountPath == '/var/log' &&
+                mount.readOnly == true
+              )
+            )
+          ) ||
+          (
+            request.resource.group == '' &&
+            request.resource.resource == 'pods' &&
+            object.metadata.ownerReferences.exists(owner,
+              owner.kind == 'DaemonSet' &&
+              owner.name == 'otel-collector-agent'
+            ) &&
+            object.spec.volumes.exists(volume,
+              has(volume.hostPath) &&
+              volume.hostPath.path == '/var/log' &&
+              volume.hostPath.type == 'Directory'
+            ) &&
+            object.spec.containers.exists(container,
+              container.name == 'opentelemetry-collector' &&
+              container.volumeMounts.exists(mount,
+                mount.name == 'varlog' &&
+                mount.mountPath == '/var/log' &&
+                mount.readOnly == true
+              )
+            )
+          )
+        )

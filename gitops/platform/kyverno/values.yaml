@@ -16,6 +16,11 @@ reportsController:
   serviceMonitor:
     enabled: true
 
+features:
+  policyExceptions:
+    enabled: true
+    namespace: monitoring
+
 grafana:
   enabled: true
   namespace: monitoring
