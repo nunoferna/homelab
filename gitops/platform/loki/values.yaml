@@ -72,6 +72,10 @@ gateway:
       cpu: 200m
       memory: 128Mi
 
+memberlist:
+  service:
+    publishNotReadyAddresses: true
+
 networkPolicy:
   enabled: true
   flavor: cilium
