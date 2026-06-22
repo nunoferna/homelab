@@ -30,6 +30,14 @@ prometheusOperator:
   containerSecurityContext:
     seccompProfile:
       type: RuntimeDefault
+  prometheusConfigReloader:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 100m
+        memory: 64Mi
 
 prometheus:
   networkPolicy:
@@ -53,6 +61,25 @@ prometheus:
           limits:
             cpu: "1"
             memory: 2Gi
+      - name: config-reloader
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
+    initContainers:
+      - name: init-config-reloader
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
     serviceMonitorSelectorNilUsesHelmValues: false
     storageSpec:
       volumeClaimTemplate:
