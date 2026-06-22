@@ -61,16 +61,31 @@ prometheus:
 grafana:
   enabled: true
   replicas: 1
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
   containerSecurityContext:
     allowPrivilegeEscalation: false
     readOnlyRootFilesystem: true
-    capabilities:
-      drop:
-        - ALL
+    runAsNonRoot: true
+    runAsUser: 472
+  sidecar:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 65534
   admin:
     existingSecret: grafana-admin
     userKey: admin-user
     passwordKey: admin-password
+  initChownData:
+    enabled: false
   resources:
     requests:
       cpu: 50m
@@ -91,6 +106,8 @@ ingress:
 
 nodeExporter:
   enabled: true
+
+prometheus-node-exporter:
   resources:
     requests:
       cpu: 100m
@@ -98,6 +115,16 @@ nodeExporter:
     limits:
       cpu: 200m
       memory: 50Mi
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
 
 kube-state-metrics:
   resources:
