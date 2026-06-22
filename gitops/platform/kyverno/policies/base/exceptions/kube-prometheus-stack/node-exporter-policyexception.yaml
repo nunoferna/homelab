@@ -22,19 +22,7 @@ spec:
           (
             request.resource.group == 'apps' &&
             request.resource.resource == 'daemonsets' &&
-            object.metadata.name == 'kube-prometheus-stack-prometheus-node-exporter' &&
-            object.spec.template.spec.hostNetwork == true &&
-            object.spec.template.spec.hostPID == true &&
-            object.spec.template.spec.volumes.all(volume,
-              !has(volume.hostPath) ||
-              (
-                volume.hostPath.path in ['/', '/proc', '/sys'] &&
-                (!has(volume.hostPath.type) || volume.hostPath.type == 'Directory')
-              )
-            ) &&
-            object.spec.template.spec.containers.exists(container,
-              container.name == 'node-exporter'
-            )
+            object.metadata.name == 'kube-prometheus-stack-prometheus-node-exporter'
           ) ||
           (
             request.resource.group == '' &&
@@ -42,18 +30,6 @@ spec:
             object.metadata.ownerReferences.exists(owner,
               owner.kind == 'DaemonSet' &&
               owner.name == 'kube-prometheus-stack-prometheus-node-exporter'
-            ) &&
-            object.spec.hostNetwork == true &&
-            object.spec.hostPID == true &&
-            object.spec.volumes.all(volume,
-              !has(volume.hostPath) ||
-              (
-                volume.hostPath.path in ['/', '/proc', '/sys'] &&
-                (!has(volume.hostPath.type) || volume.hostPath.type == 'Directory')
-              )
-            ) &&
-            object.spec.containers.exists(container,
-              container.name == 'node-exporter'
             )
           )
         )
