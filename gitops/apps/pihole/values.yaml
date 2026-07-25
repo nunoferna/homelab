@@ -71,6 +71,19 @@ pihole:
 
 metrics:
   enabled: true
+  podSecurityContext:
+    runAsNonRoot: false
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: false
+    seccompProfile:
+      type: RuntimeDefault
   dashboards:
     enabled: true
   serviceMonitor:
@@ -97,3 +110,15 @@ persistence:
     enabled: true
     accessMode: ReadWriteOnce
     size: 5Gi
+
+podSecurityContext:
+  runAsNonRoot: false
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: false
+  runAsNonRoot: false
+  seccompProfile:
+    type: RuntimeDefault

@@ -1,0 +1,70 @@
+apiVersion: policies.kyverno.io/v1
+kind: PolicyException
+metadata:
+  name: pihole-metrics-root-user
+  namespace: pihole
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  policyRefs:
+    - kind: ValidatingPolicy
+      name: require-run-as-nonroot
+  matchConditions:
+    - name: only-pihole-metrics-exporter
+      expression: >-
+        request.namespace == 'pihole' && (
+          (
+            request.resource.group == 'apps' &&
+            request.resource.resource == 'deployments' &&
+            object.metadata.name == 'pihole-metrics' &&
+            object.spec.template.spec.securityContext.runAsNonRoot == false &&
+            object.spec.template.spec.securityContext.seccompProfile.type == 'RuntimeDefault' &&
+            object.spec.template.spec.containers.exists(container,
+              container.name == 'metrics' &&
+              container.image.startsWith('ekofr/pihole-exporter:') &&
+              container.securityContext.runAsNonRoot == false &&
+              container.securityContext.allowPrivilegeEscalation == false &&
+              container.securityContext.readOnlyRootFilesystem == true &&
+              container.securityContext.capabilities.drop.exists(capability, capability == 'ALL') &&
+              container.securityContext.seccompProfile.type == 'RuntimeDefault'
+            )
+          ) ||
+          (
+            request.resource.group == 'apps' &&
+            request.resource.resource == 'replicasets' &&
+            object.metadata.name.startsWith('pihole-metrics-') &&
+            object.metadata.ownerReferences.exists(owner,
+              owner.kind == 'Deployment' &&
+              owner.name == 'pihole-metrics'
+            ) &&
+            object.spec.template.spec.securityContext.runAsNonRoot == false &&
+            object.spec.template.spec.securityContext.seccompProfile.type == 'RuntimeDefault' &&
+            object.spec.template.spec.containers.exists(container,
+              container.name == 'metrics' &&
+              container.image.startsWith('ekofr/pihole-exporter:') &&
+              container.securityContext.runAsNonRoot == false &&
+              container.securityContext.allowPrivilegeEscalation == false &&
+              container.securityContext.readOnlyRootFilesystem == true &&
+              container.securityContext.capabilities.drop.exists(capability, capability == 'ALL') &&
+              container.securityContext.seccompProfile.type == 'RuntimeDefault'
+            )
+          ) ||
+          (
+            request.resource.group == '' &&
+            request.resource.resource == 'pods' &&
+            object.metadata.ownerReferences.exists(owner,
+              owner.kind == 'ReplicaSet'
+            ) &&
+            object.spec.securityContext.runAsNonRoot == false &&
+            object.spec.securityContext.seccompProfile.type == 'RuntimeDefault' &&
+            object.spec.containers.exists(container,
+              container.name == 'metrics' &&
+              container.image.startsWith('ekofr/pihole-exporter:') &&
+              container.securityContext.runAsNonRoot == false &&
+              container.securityContext.allowPrivilegeEscalation == false &&
+              container.securityContext.readOnlyRootFilesystem == true &&
+              container.securityContext.capabilities.drop.exists(capability, capability == 'ALL') &&
+              container.securityContext.seccompProfile.type == 'RuntimeDefault'
+            )
+          )
+        )
