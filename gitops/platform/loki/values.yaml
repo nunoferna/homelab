@@ -28,6 +28,7 @@ deploymentMode: SingleBinary
 
 singleBinary:
   replicas: 1
+  sidecar: false
   resources:
     requests:
       cpu: 100m
