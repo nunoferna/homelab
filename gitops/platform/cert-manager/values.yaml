@@ -6,6 +6,10 @@ config:
   kind: ControllerConfiguration
   enableGatewayAPI: true
 
+containerSecurityContext:
+  seccompProfile:
+    type: RuntimeDefault
+
 resources:
   requests:
     cpu: 10m
@@ -15,6 +19,9 @@ resources:
     memory: 128Mi
 
 webhook:
+  containerSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
   resources:
     requests:
       cpu: 10m
@@ -24,6 +31,9 @@ webhook:
       memory: 128Mi
 
 cainjector:
+  containerSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
   resources:
     requests:
       cpu: 10m
@@ -31,3 +41,8 @@ cainjector:
     limits:
       cpu: 100m
       memory: 256Mi
+
+startupapicheck:
+  containerSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
