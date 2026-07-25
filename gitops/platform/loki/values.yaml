@@ -15,6 +15,9 @@ loki:
           prefix: index_
           period: 24h
 
+defaults:
+  hostUsers: false
+
 chunksCache:
   enabled: false
 
@@ -64,6 +67,7 @@ bloomGateway:
 
 gateway:
   enabled: true
+  hostUsers: false
   resources:
     requests:
       cpu: 25m

@@ -10,7 +10,12 @@ kubeProxy:
 kubelet:
   jobNameOverride: k3s-server
 
+alertmanager:
+  alertmanagerSpec:
+    hostUsers: false
+
 prometheusOperator:
+  hostUsers: false
   resources:
     requests:
       cpu: 100m
@@ -44,6 +49,7 @@ prometheus:
     enabled: true
     flavor: cilium
   prometheusSpec:
+    hostUsers: false
     containers:
       - name: prometheus
         securityContext:
@@ -92,6 +98,7 @@ prometheus:
 
 grafana:
   enabled: true
+  hostUsers: false
   replicas: 1
   securityContext:
     seccompProfile:
@@ -159,6 +166,7 @@ prometheus-node-exporter:
       type: RuntimeDefault
 
 kube-state-metrics:
+  hostUsers: false
   resources:
     requests:
       cpu: 50m

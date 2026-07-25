@@ -8,12 +8,15 @@ resources:
     cpu: 200m
     memory: 256Mi
 
+hostUsers: false
+
 podSecurityContext:
   runAsNonRoot: true
   seccompProfile:
     type: RuntimeDefault
 
 webhook:
+  hostUsers: false
   resources:
     requests:
       cpu: 10m
@@ -27,6 +30,7 @@ webhook:
       type: RuntimeDefault
 
 certController:
+  hostUsers: false
   resources:
     requests:
       cpu: 10m

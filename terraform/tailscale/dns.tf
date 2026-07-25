@@ -1,14 +1,18 @@
-resource "tailscale_dns_nameservers" "global_dns" {
-  nameservers = [
-    "192.168.1.2", # Pi-hole DNS LoadBalancer
-  ]
-}
+resource "tailscale_dns_configuration" "tailnet" {
+  magic_dns          = true
+  override_local_dns = true
 
-resource "tailscale_dns_preferences" "params" {
-  magic_dns = true
-}
+  nameservers {
+    address            = "192.168.1.2"
+    use_with_exit_node = true
+  }
 
-resource "tailscale_dns_split_nameservers" "home_lab" {
-  domain      = "apps.internal"
-  nameservers = ["192.168.1.2"]
+  split_dns {
+    domain = "apps.internal"
+
+    nameservers {
+      address            = "192.168.1.2"
+      use_with_exit_node = true
+    }
+  }
 }

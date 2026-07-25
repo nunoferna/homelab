@@ -6,6 +6,8 @@ It:
 - Sets `acls_externally_managed_on = true` (prevents console edits/drift)
 - Applies a full policy file (JSON) from `policy.json`
 - Enables auto-approval for exit nodes tagged `tag:k8s`
+- Forces tailnet DNS through the Pi-hole LoadBalancer at `192.168.1.2`
+- Sends `apps.internal` split DNS queries to Pi-hole, including while an exit node is selected
 
 ## Prereqs
 
@@ -37,3 +39,13 @@ Your Connector defaults to tag `tag:k8s`.
 With the policy in `policy.json`, exit-node approvals for `tag:k8s` are automatic.
 
 If the operator cannot tag devices, you’ll need to adjust `tagOwners` to allow the operator’s OAuth identity to use the tag.
+
+## Notes for Pi-hole DNS
+
+The home router does not need to hand out Pi-hole as DNS. Tailscale manages DNS for tailnet clients:
+
+- `override_local_dns = true` makes tailnet clients use Pi-hole instead of local network DNS.
+- `apps.internal` is configured as split DNS to Pi-hole.
+- `use_with_exit_node = true` keeps Pi-hole DNS active when using the Kubernetes exit node.
+
+For this to work, the Kubernetes Connector must advertise and approve `192.168.1.0/24`, and Pi-hole must keep the `192.168.1.2` LoadBalancer IP.
