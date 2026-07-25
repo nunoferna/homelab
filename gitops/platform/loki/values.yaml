@@ -68,6 +68,7 @@ bloomGateway:
 gateway:
   enabled: true
   hostUsers: false
+  affinity: null
   resources:
     requests:
       cpu: 25m
@@ -75,6 +76,17 @@ gateway:
     limits:
       cpu: 200m
       memory: 128Mi
+  nginxConfig:
+    enableIPv6: false
+  metrics:
+    enabled: true
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 50m
+        memory: 64Mi
 
 memberlist:
   service:

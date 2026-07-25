@@ -7,11 +7,18 @@ kubeProxyReplacement: "true"
 # Enable Cilium L2-aware LoadBalancer on the LAN.
 l2announcements:
   enabled: true
+  leaseDuration: 30s
+  leaseRenewDeadline: 15s
+  leaseRetryPeriod: 3s
 
-# L2 announcements uses Kubernetes Leases; bump the client rate limit a bit.
+# L2 announcements and the operator use Kubernetes Leases; keep API client
+# throttling explicit for small single-node k3s environments.
 k8sClientRateLimit:
   qps: 20
   burst: 40
+  operator:
+    qps: 100
+    burst: 200
 
 enableIPv4Masquerade: true
 ipv6:
@@ -37,6 +44,13 @@ authentication:
 
 operator:
   replicas: 1
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
   prometheus:
     metricsService: true
     serviceMonitor:
