@@ -2,7 +2,7 @@ appName: kyverno-policies
 namespace: kyverno
 project: platform
 repoURL: oci://ghcr.io/kyverno/charts/kyverno-policies
-targetRevision: 3.8.0
+targetRevision: 3.8.2
 chartPath: .
 syncWave: "0"
 serverSideApply: "true"

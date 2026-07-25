@@ -16,7 +16,7 @@ resource "helm_release" "cilium" {
   name       = "cilium"
   repository = "oci://quay.io/cilium/charts"
   chart      = "cilium"
-  version    = "1.19.5"
+  version    = "1.19.6"
   namespace  = "kube-system"
 
   wait    = true
