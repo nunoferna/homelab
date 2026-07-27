@@ -1,0 +1,45 @@
+replicaCount: 1
+
+manager:
+  collectorImage:
+    repository: ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib
+    tag: 0.137.0
+  createRbacPermissions: false
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+  serviceMonitor:
+    enabled: true
+    extraLabels:
+      release: kube-prometheus-stack
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+
+admissionWebhooks:
+  certManager:
+    enabled: true
+
+crds:
+  create: true
+
+securityContext:
+  runAsGroup: 65532
+  runAsNonRoot: true
+  runAsUser: 65532
+  fsGroup: 65532
+  seccompProfile:
+    type: RuntimeDefault
+
+testFramework:
+  image:
+    tag: 1.37.0

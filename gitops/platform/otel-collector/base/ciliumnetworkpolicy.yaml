@@ -4,10 +4,7 @@ metadata:
   name: otel-collector
   namespace: otel-collector
 spec:
-  endpointSelector:
-    matchLabels:
-      app.kubernetes.io/name: opentelemetry-collector
-      app.kubernetes.io/instance: otel-collector
+  endpointSelector: {}
   ingress:
     - fromEndpoints:
         - matchLabels:
@@ -19,6 +16,8 @@ spec:
             - port: "4318"
               protocol: TCP
             - port: "8888"
+              protocol: TCP
+            - port: "8889"
               protocol: TCP
     - fromEntities:
         - cluster
@@ -47,11 +46,11 @@ spec:
     - toEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: monitoring
-            app.kubernetes.io/name: loki
-            app.kubernetes.io/component: gateway
       toPorts:
         - ports:
             - port: "80"
               protocol: TCP
-            - port: "8080"
+            - port: "4317"
+              protocol: TCP
+            - port: "4318"
               protocol: TCP

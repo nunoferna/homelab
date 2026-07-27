@@ -1,0 +1,49 @@
+replicas: 1
+
+tempo:
+  reportingEnabled: false
+  retention: 48h
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 1Gi
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+  metricsGenerator:
+    enabled: false
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo/traces
+      wal:
+        path: /var/tempo/wal
+
+securityContext:
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  runAsNonRoot: true
+  seccompProfile:
+    type: RuntimeDefault
+
+serviceMonitor:
+  enabled: true
+  interval: 30s
+  additionalLabels:
+    release: kube-prometheus-stack
+
+persistence:
+  enabled: true
+  size: 10Gi
+
+networkPolicy:
+  enabled: false

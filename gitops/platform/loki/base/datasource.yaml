@@ -9,8 +9,9 @@ data:
   loki-datasource.yaml: |-
     apiVersion: 1
     datasources:
-    - name: Loki
-      type: loki
-      url: http://loki-gateway.monitoring.svc.cluster.local
-      access: proxy
-      isDefault: false
+      - name: Loki
+        uid: Loki
+        type: loki
+        url: http://loki-gateway.monitoring.svc.cluster.local
+        access: proxy
+        isDefault: false

@@ -1,25 +1,28 @@
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
 metadata:
-  name: grafana
+  name: opentelemetry-operator
+  namespace: opentelemetry-operator
 spec:
   endpointSelector:
     matchLabels:
-      app.kubernetes.io/name: grafana
-      app.kubernetes.io/instance: kube-prometheus-stack
+      app.kubernetes.io/name: opentelemetry-operator
+      app.kubernetes.io/component: controller-manager
   ingress:
     - fromEntities:
-        - ingress
+        - kube-apiserver
       toPorts:
         - ports:
-            - port: "3000"
+            - port: "9443"
               protocol: TCP
     - fromEndpoints:
         - matchLabels:
             k8s:io.kubernetes.pod.namespace: monitoring
       toPorts:
         - ports:
-            - port: "3000"
+            - port: "8080"
+              protocol: TCP
+            - port: "8443"
               protocol: TCP
   egress:
     - toEndpoints:
@@ -37,19 +40,3 @@ spec:
               - matchPattern: "*"
     - toEntities:
         - kube-apiserver
-    - toEndpoints:
-        - matchLabels:
-            k8s:io.kubernetes.pod.namespace: monitoring
-      toPorts:
-        - ports:
-            - port: "9090"
-              protocol: TCP
-            - port: "3100"
-              protocol: TCP
-            - port: "80"
-              protocol: TCP
-            - port: "3200"
-              protocol: TCP
-          rules:
-            http:
-              - {}

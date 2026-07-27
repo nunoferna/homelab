@@ -18,14 +18,13 @@ spec:
           (
             request.resource.group == 'apps' &&
             request.resource.resource == 'daemonsets' &&
-            object.metadata.name == 'otel-collector-agent' &&
+            object.metadata.name == 'otel-agent-collector' &&
             object.spec.template.spec.volumes.exists(volume,
               has(volume.hostPath) &&
               volume.hostPath.path == '/var/log' &&
               volume.hostPath.type == 'Directory'
             ) &&
             object.spec.template.spec.containers.exists(container,
-              container.name == 'opentelemetry-collector' &&
               container.volumeMounts.exists(mount,
                 mount.name == 'varlog' &&
                 mount.mountPath == '/var/log' &&
@@ -38,7 +37,7 @@ spec:
             request.resource.resource == 'pods' &&
             object.metadata.ownerReferences.exists(owner,
               owner.kind == 'DaemonSet' &&
-              owner.name == 'otel-collector-agent'
+              owner.name == 'otel-agent-collector'
             ) &&
             object.spec.volumes.exists(volume,
               has(volume.hostPath) &&
@@ -46,7 +45,6 @@ spec:
               volume.hostPath.type == 'Directory'
             ) &&
             object.spec.containers.exists(container,
-              container.name == 'opentelemetry-collector' &&
               container.volumeMounts.exists(mount,
                 mount.name == 'varlog' &&
                 mount.mountPath == '/var/log' &&

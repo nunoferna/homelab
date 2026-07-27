@@ -21,6 +21,7 @@ spec:
     - oci://ghcr.io/kyverno/charts/kyverno-policies
     - oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
     - oci://quay.io/jetstack/charts/cert-manager
+    - oci://ghcr.io/grafana-community/helm-charts/tempo
   destinations:
     - namespace: backstage
       server: https://kubernetes.default.svc
@@ -35,6 +36,8 @@ spec:
     - namespace: kyverno
       server: https://kubernetes.default.svc
     - namespace: monitoring
+      server: https://kubernetes.default.svc
+    - namespace: opentelemetry-operator
       server: https://kubernetes.default.svc
     - namespace: otel-collector
       server: https://kubernetes.default.svc
