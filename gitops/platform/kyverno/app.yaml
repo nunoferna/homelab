@@ -6,4 +6,3 @@ targetRevision: 3.8.2
 chartPath: .
 syncWave: "-1"
 serverSideApply: "true"
-noBase: true
