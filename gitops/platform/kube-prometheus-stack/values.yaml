@@ -138,6 +138,23 @@ grafana:
   grafana.ini:
     server:
       root_url: https://grafana.apps.internal
+  additionalDataSources:
+    - name: Tempo
+      uid: Tempo
+      type: tempo
+      url: http://tempo.monitoring.svc.cluster.local:3200
+      access: proxy
+      isDefault: false
+      jsonData:
+        tracesToLogsV2:
+          datasourceUid: Loki
+          tags:
+            - key: service.name
+              value: service
+            - key: k8s.namespace.name
+              value: namespace
+        tracesToMetrics:
+          datasourceUid: prometheus
 
 # We use Gateway API, so disable the default Ingress
 ingress:
