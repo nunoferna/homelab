@@ -7,8 +7,6 @@ kubeScheduler:
   enabled: false
 kubeProxy:
   enabled: false
-kubelet:
-  jobNameOverride: k3s-server
 
 alertmanager:
   alertmanagerSpec:
