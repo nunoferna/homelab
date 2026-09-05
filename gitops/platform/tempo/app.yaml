@@ -2,7 +2,7 @@ appName: tempo
 namespace: monitoring
 project: platform
 repoURL: oci://ghcr.io/grafana-community/helm-charts/tempo
-targetRevision: 2.2.3
+targetRevision: 2.3.0
 chartPath: .
 syncWave: "9"
 serverSideApply: "true"

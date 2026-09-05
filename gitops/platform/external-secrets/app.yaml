@@ -2,7 +2,7 @@ appName: external-secrets
 namespace: external-secrets
 project: platform
 repoURL: oci://ghcr.io/external-secrets/charts/external-secrets
-targetRevision: 2.9.0
+targetRevision: 2.10.0
 chartPath: .
 syncWave: "1"
 serverSideApply: "true"
