@@ -16,7 +16,7 @@ resource "helm_release" "cilium" {
   name       = "cilium"
   repository = "oci://quay.io/cilium/charts"
   chart      = "cilium"
-  version    = "1.20.0"
+  version    = "1.20.2"
   namespace  = "kube-system"
 
   wait    = true
@@ -37,7 +37,7 @@ resource "helm_release" "argocd" {
   name             = "argocd"
   repository       = "oci://ghcr.io/argoproj/argo-helm"
   chart            = "argo-cd"
-  version          = "10.3.2"
+  version          = "10.9.2"
   namespace        = "argocd"
   create_namespace = true
 
